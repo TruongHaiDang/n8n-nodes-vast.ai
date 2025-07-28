@@ -6,15 +6,15 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
-export class ExampleNode implements INodeType {
+export class AccountsNode implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Example Node',
-		name: 'exampleNode',
-		group: ['transform'],
+		displayName: 'Accounts',
+		name: 'accountsNode',
+		group: ['Vast.AI'],
 		version: 1,
-		description: 'Basic Example Node',
+		description: 'Vast.AI Account Management',
 		defaults: {
-			name: 'Example Node',
+			name: 'Accounts',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
@@ -23,12 +23,17 @@ export class ExampleNode implements INodeType {
 			// Node properties which the user gets displayed and
 			// can change on the node.
 			{
-				displayName: 'My String',
-				name: 'myString',
-				type: 'string',
-				default: '',
-				placeholder: 'Placeholder value',
-				description: 'The description text',
+				displayName: 'Actions',
+				name: 'action',
+				type: 'options',
+				options: [
+					{
+						name: 'Show User',
+						value: 'show-user',
+					},
+				],
+				default: 'show-user',
+				description: 'Manage your vast.ai account',
 			},
 		],
 	};

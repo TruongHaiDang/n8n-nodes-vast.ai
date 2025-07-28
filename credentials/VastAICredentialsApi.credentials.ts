@@ -5,9 +5,9 @@ import {
 	INodeProperties,
 } from 'n8n-workflow';
 
-export class ExampleCredentialsApi implements ICredentialType {
-	name = 'exampleCredentialsApi';
-	displayName = 'Example Credentials API';
+export class VastAICredentialsApi implements ICredentialType {
+	name = 'vastAICredentialsApi';
+	displayName = 'Vast.AI Credentials API';
 
 	documentationUrl = 'https://your-docs-url';
 
@@ -16,18 +16,10 @@ export class ExampleCredentialsApi implements ICredentialType {
 		// Properties can be defined exactly in the same way
 		// as node properties.
 		{
-			displayName: 'User Name',
-			name: 'username',
+			displayName: 'API Key',
+			name: 'apiKey',
 			type: 'string',
-			default: '',
-		},
-		{
-			displayName: 'Password',
-			name: 'password',
-			type: 'string',
-			typeOptions: {
-				password: true,
-			},
+			typeOptions: { password: true },
 			default: '',
 		},
 	];
@@ -38,22 +30,21 @@ export class ExampleCredentialsApi implements ICredentialType {
 	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {
-			auth: {
-				username: '={{ $credentials.username }}',
-				password: '={{ $credentials.password }}',
-			},
-			qs: {
-				// Send this as part of the query string
-				n8n: 'rocks',
-			},
+			headers: {
+				Authorization: '={{"Bearer " + $credentials.apiKey}}',
+			}
 		},
 	};
 
 	// The block below tells how this credential can be tested
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: 'https://example.com/',
-			url: '',
+			method: 'GET',
+			url: 'https://console.vast.ai/api/v0/users/current/',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
 		},
 	};
 }
