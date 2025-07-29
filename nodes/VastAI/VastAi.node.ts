@@ -6,10 +6,10 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
-export class AccountsNode implements INodeType {
+export class VastAINode implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Accounts',
-		name: 'accountsNode',
+		displayName: 'Vast.AI',
+		name: 'vastAi',
 		group: ['Vast.AI'],
 		version: 1,
 		description: 'Vast.AI Account Management',
@@ -22,19 +22,7 @@ export class AccountsNode implements INodeType {
 		properties: [
 			// Node properties which the user gets displayed and
 			// can change on the node.
-			{
-				displayName: 'Actions',
-				name: 'action',
-				type: 'options',
-				options: [
-					{
-						name: 'Show User',
-						value: 'show-user',
-					},
-				],
-				default: 'show-user',
-				description: 'Manage your vast.ai account',
-			},
+			
 		],
 	};
 
@@ -45,18 +33,12 @@ export class AccountsNode implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 
-		let item: INodeExecutionData;
-		let myString: string;
-
 		// Iterates over all input items and add the key "myString" with the
 		// value the parameter "myString" resolves to.
 		// (This could be a different value for each item in case it contains an expression)
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 			try {
-				myString = this.getNodeParameter('myString', itemIndex, '') as string;
-				item = items[itemIndex];
 
-				item.json.myString = myString;
 			} catch (error) {
 				// This node should never fail but we want to showcase how
 				// to handle errors.
