@@ -5,7 +5,8 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 	ILoadOptionsFunctions,
-	IHttpRequestOptions
+	IHttpRequestOptions,
+	IHttpRequestMethods
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
@@ -106,7 +107,7 @@ export class VastAiNode implements INodeType {
 							{ name: 'Show Api Keys', value: 'show_api_keys_get' },
 							// { name: 'Create Env-Var', value: 'create_env_var_post' },
 							// { name: 'Delete Env Var', value: 'delete_env_var_delete' },
-							// { name: 'Show Env Vars', value: 'show_env_vars_get' },
+							{ name: 'Show Env Vars', value: 'show_env_vars_get' },
 							// { name: 'Update Env Var', value: 'update_env_var_put' },
 							// { name: 'Create Ssh-Key', value: 'create_ssh_key_post' },
 							// { name: 'Show Ssh Keys', value: 'show_ssh_keys_get' },
@@ -117,11 +118,11 @@ export class VastAiNode implements INodeType {
 							// { name: 'Delete Ssh Key', value: 'delete_ssh_key_delete' },
 							// { name: 'Update Ssh Key', value: 'update_ssh_key_put' },
 							// { name: 'Reset Api Key', value: 'reset_api_key_put' },
-							// { name: 'Show Connections', value: 'show_connections_get' },
+							{ name: 'Show Connections', value: 'show_connections_get' },
 							// { name: 'Show Ipaddrs', value: 'show_ipaddrs_get' },
-							// { name: 'Show Subaccounts', value: 'show_subaccounts_get' },
+							{ name: 'Show Subaccounts', value: 'show_subaccounts_get' },
 							// { name: 'Show Team Role', value: 'show_team_role_get' },
-							// { name: 'Show User', value: 'show_user_get' },
+							{ name: 'Show User', value: 'show_user_get' },
 							// { name: 'Transfer Credit', value: 'transfer_credit_put' },
 						];
 					case 'serverless':
@@ -421,7 +422,7 @@ export class VastAiNode implements INodeType {
 			"show_api_keys_get": "/auth/apikeys/",
 			"create_env_var_post": "",
 			"delete_env_var_delete": "",
-			"show_env_vars_get": "",
+			"show_env_vars_get": "/secrets/",
 			"update_env_var_put": "",
 			"create_ssh_key_post": "",
 			"create_subaccount_post": "",
@@ -431,11 +432,11 @@ export class VastAiNode implements INodeType {
 			"delete_ssh_key_delete": "",
 			"update_ssh_key_put": "",
 			"reset_api_key_put": "",
-			"show_connections_get": "",
+			"show_connections_get": "/users/cloud_integrations/",
 			"show_ipaddrs_get": "",
-			"show_subaccounts_get": "",
+			"show_subaccounts_get": "/subaccounts/",
 			"show_team_role_get": "",
-			"show_user_get": "",
+			"show_user_get": "/users/current/",
 			"transfer_credit_put": "",
 
 			// Serverless
@@ -484,6 +485,108 @@ export class VastAiNode implements INodeType {
 			"show_deposit_get": "",
 			"show_earnings_get": "",
 			"show_invoice_get": ""
+		};
+		const apisReqMethodMap: Record<string, IHttpRequestMethods> = {
+			// Instances
+			"attach_ssh_key_post": "POST",
+			"cancel_copy_delete": "DELETE",
+			"copy_put": "PUT",
+			"cancel_sync_delete": "DELETE",
+			"cloud_copy_post": "POST",
+			"change_bid_put": "PUT",
+			"create_instance_put": "PUT",
+			"destroy_instance_delete": "DELETE",
+			"manage_instance_put": "PUT",
+			"show_instance_get": "GET",
+			"detach_ssh_key_delete": "DELETE",
+			"execute_put": "PUT",
+			"show_logs_put": "PUT",
+			"prepay_instance_put": "PUT",
+			"reboot_instance_put": "PUT",
+			"recycle_instance_put": "PUT",
+			"show_ssh_keys_get": "GET",
+			"show_instances_get": "GET",
+
+			// Machines
+			"cancel_maint_put": "PUT",
+			"cleanup_machine_put": "PUT",
+			"list_machine_put": "PUT",
+			"remove_defjob_delete": "DELETE",
+			"show_reports_get": "GET",
+			"schedule_maint_put": "PUT",
+			"set_defjob_put": "PUT",
+			"set_min_bid_put": "PUT",
+			"show_machines_get": "GET",
+			"unlist_machine_delete": "DELETE",
+
+			// Accounts
+			"create_api_key_post": "POST",
+			"show_api_keys_get": "GET",
+			"create_env_var_post": "POST",
+			"delete_env_var_delete": "DELETE",
+			"show_env_vars_get": "GET",
+			"update_env_var_put": "PUT",
+			"create_ssh_key_post": "POST",
+			"create_subaccount_post": "POST",
+			"set_user_put": "PUT",
+			"delete_api_key_delete": "DELETE",
+			"show_api_key_get": "GET",
+			"delete_ssh_key_delete": "DELETE",
+			"update_ssh_key_put": "PUT",
+			"reset_api_key_put": "PUT",
+			"show_connections_get": "GET",
+			"show_ipaddrs_get": "GET",
+			"show_subaccounts_get": "GET",
+			"show_team_role_get": "GET",
+			"show_user_get": "GET",
+			"transfer_credit_put": "PUT",
+
+			// Serverless
+			"create_autogroup_post": "POST",
+			"show_autogroup_get": "GET",
+			"create_endpoint_post": "POST",
+			"show_endpoints_get": "GET",
+			"delete_autogroup_delete": "DELETE",
+			"update_autogroup_put": "PUT",
+			"delete_endpoint_delete": "DELETE",
+			"update_endpoint_put": "PUT",
+			"get_autogroup_logs_post": "POST",
+			"get_autogroup_workers_post": "POST",
+			"get_endpoint_logs_post": "POST",
+			"get_endpoint_workers_post": "POST",
+			"route_post": "POST",
+
+			// Team
+			"create_team_post": "POST",
+			"create_team_role_post": "POST",
+			"destroy_team_delete": "DELETE",
+			"invite_team_member_post": "POST",
+			"remove_team_member_delete": "DELETE",
+			"remove_team_role_delete": "DELETE",
+			"show_team_members_get": "GET",
+			"update_team_role_put": "PUT",
+			"show_team_roles_get": "GET",
+
+			// Template
+			"update_template_post": "POST",
+
+			// Search
+			"search_templates_get": "GET",
+			"search_benchmarks_get": "GET",
+			"search_offers_put": "PUT",
+
+			// Volumes
+			"delete_volume_delete": "DELETE",
+			"rent_volume_put": "PUT",
+			"list_volumes_get": "GET",
+			"search_volumes_post": "POST",
+			"unlist_volume_post": "POST",
+
+			// Billing
+			"search_invoices_get": "GET",
+			"show_deposit_get": "GET",
+			"show_earnings_get": "GET",
+			"show_invoice_get": "GET"
 		}
 
 		const items = this.getInputData();
@@ -496,17 +599,19 @@ export class VastAiNode implements INodeType {
 			try {
 				const selectedApi = this.getNodeParameter('api', itemIndex) as string;
 				let url: string = `${endPoint}${apisMap[selectedApi]}`;
+				let method: IHttpRequestMethods = apisReqMethodMap[selectedApi];
 
 				// Lấy credentials đã được mã hóa
 				const credentials = await this.getCredentials('vastAICredentialsApi');
 
 				// Tùy chọn cho yêu cầu HTTP
 				const requestOptions: IHttpRequestOptions = {
-					method: 'GET',
+					method: method,
 					url: url,
 					headers: {
-						Authorization: `Bearer ${credentials.apiKey}`,
+						'Accept': 'application/json',
 						'Content-Type': 'application/json',
+						Authorization: `Bearer ${credentials.apiKey}`,
 					},
 					json: true,
 				};
