@@ -36,7 +36,7 @@
       "dist/credentials/VastAICredentialsApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/ExampleNode/ShowUserNode.node.js"
+      "dist/nodes/VastAiNode/VastAiNode.node.js"
     ]
   },
   "devDependencies": {
