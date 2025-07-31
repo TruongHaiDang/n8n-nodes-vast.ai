@@ -174,6 +174,199 @@ export class VastAiNode implements INodeType {
 						return [];
 				}
 			},
+			async getApiParams(this: ILoadOptionsFunctions) {
+				const api = this.getCurrentNodeParameter('api');
+				switch (api) {
+					// Instances cases
+					case 'attach_ssh_key_post':
+						return [];
+					case 'cancel_copy_delete':
+						return [];
+					case 'copy_put':
+						return [];
+					case 'cancel_sync_delete':
+						return [];
+					case 'cloud_copy_post':
+						return [];
+					case 'change_bid_put':
+						return [];
+					case 'create_instance_put':
+						return [];
+					case 'destroy_instance_delete':
+						return [];
+					case 'manage_instance_put':
+						return [];
+					case 'show_instance_get':
+						return [];
+					case 'detach_ssh_key_delete':
+						return [];
+					case 'execute_put':
+						return [];
+					case 'show_logs_put':
+						return [];
+					case 'prepay_instance_put':
+						return [];
+					case 'reboot_instance_put':
+						return [];
+					case 'recycle_instance_put':
+						return [];
+					case 'show_ssh_keys_get':
+						return [];
+					case 'show_instances_get':
+						return [];
+
+					// Machines cases
+					case 'cancel_maint_put':
+						return [];
+					case 'cleanup_machine_put':
+						return [];
+					case 'list_machine_put':
+						return [];
+					case 'remove_defjob_delete':
+						return [];
+					case 'show_reports_get':
+						return [];
+					case 'schedule_maint_put':
+						return [];
+					case 'set_defjob_put':
+						return [];
+					case 'set_min_bid_put':
+						return [];
+					case 'show_machines_get':
+						return [];
+					case 'unlist_machine_delete':
+						return [];
+
+					// Accounts cases
+					case 'create_api_key_post':
+						return [];
+					case 'show_api_keys_get':
+						return [];
+					case 'create_env_var_post':
+						return [];
+					case 'delete_env_var_delete':
+						return [];
+					case 'show_env_vars_get':
+						return [];
+					case 'update_env_var_put':
+						return [];
+					case 'create_ssh_key_post':
+						return [];
+					case 'show_ssh_keys_get':
+						return [];
+					case 'create_subaccount_post':
+						return [];
+					case 'set_user_put':
+						return [];
+					case 'delete_api_key_delete':
+						return [];
+					case 'show_api_key_get':
+						return [];
+					case 'delete_ssh_key_delete':
+						return [];
+					case 'update_ssh_key_put':
+						return [];
+					case 'reset_api_key_put':
+						return [];
+					case 'show_connections_get':
+						return [];
+					case 'show_ipaddrs_get':
+						return [];
+					case 'show_subaccounts_get':
+						return [];
+					case 'show_team_role_get':
+						return [];
+					case 'show_user_get':
+						return [];
+					case 'transfer_credit_put':
+						return [];
+
+					// Serverless cases
+					case 'create_autogroup_post':
+						return [];
+					case 'show_autogroup_get':
+						return [];
+					case 'create_endpoint_post':
+						return [];
+					case 'show_endpoints_get':
+						return [];
+					case 'delete_autogroup_delete':
+						return [];
+					case 'update_autogroup_put':
+						return [];
+					case 'delete_endpoint_delete':
+						return [];
+					case 'update_endpoint_put':
+						return [];
+					case 'get_autogroup_logs_post':
+						return [];
+					case 'get_autogroup_workers_post':
+						return [];
+					case 'get_endpoint_logs_post':
+						return [];
+					case 'get_endpoint_workers_post':
+						return [];
+					case 'route_post':
+						return [];
+
+					// Team cases
+					case 'create_team_post':
+						return [];
+					case 'create_team_role_post':
+						return [];
+					case 'destroy_team_delete':
+						return [];
+					case 'invite_team_member_post':
+						return [];
+					case 'remove_team_member_delete':
+						return [];
+					case 'remove_team_role_delete':
+						return [];
+					case 'show_team_members_get':
+						return [];
+					case 'update_team_role_put':
+						return [];
+					case 'show_team_roles_get':
+						return [];
+
+					// Template cases
+					case 'update_template_post':
+						return [];
+
+					// Search cases
+					case 'search_templates_get':
+						return [];
+					case 'search_benchmarks_get':
+						return [];
+					case 'search_offers_put':
+						return [];
+
+					// Volumes cases
+					case 'delete_volume_delete':
+						return [];
+					case 'rent_volume_put':
+						return [];
+					case 'list_volumes_get':
+						return [];
+					case 'search_volumes_post':
+						return [];
+					case 'unlist_volume_post':
+						return [];
+
+					// Billing cases
+					case 'search_invoices_get':
+						return [];
+					case 'show_deposit_get':
+						return [];
+					case 'show_earnings_get':
+						return [];
+					case 'show_invoice_get':
+						return [];
+
+					default:
+						return [];
+				}
+			}
 		}
 	}
 
