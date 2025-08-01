@@ -8,6 +8,11 @@ import type {
 	IHttpRequestOptions,
 	IHttpRequestMethods
 } from 'n8n-workflow';
+
+interface ApiEndpoint {
+	endpoint: string;
+	method: IHttpRequestMethods;
+}
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
 export class VastAiNode implements INodeType {
@@ -39,13 +44,13 @@ export class VastAiNode implements INodeType {
 				options: [
 					{ name: 'Accounts', value: 'accounts' },
 					// { name: 'Billing', value: 'billing' },
-					// { name: 'Instances', value: 'instances' },
+					{ name: 'Instances', value: 'instances' },
 					// { name: 'Machines', value: 'machines' },
 					// { name: 'Search', value: 'search' },
-					// { name: 'Serverless', value: 'serverless' },
+					{ name: 'Serverless', value: 'serverless' },
 					// { name: 'Team', value: 'team' },
 					// { name: 'Template', value: 'template' },
-					// { name: 'Volumes', value: 'volumes' },
+					{ name: 'Volumes', value: 'volumes' },
 				],
 				default: 'accounts',
 				description: 'Select resource',
@@ -86,7 +91,7 @@ export class VastAiNode implements INodeType {
 							// { name: 'Reboot Instance', value: 'reboot_instance_put' },
 							// { name: 'Recycle Instance', value: 'recycle_instance_put' },
 							// { name: 'Show SSH-Keys', value: 'show_ssh_keys_get' },
-							// { name: 'Show Instances', value: 'show_instances_get' },
+							{ name: 'Show Instances', value: 'show_instances_get' },
 						];
 					case 'machines':
 						return [
@@ -128,9 +133,9 @@ export class VastAiNode implements INodeType {
 					case 'serverless':
 						return [
 							// { name: 'Create Autogroup', value: 'create_autogroup_post' },
-							// { name: 'Show Autogroup', value: 'show_autogroup_get' },
+							{ name: 'Show Autogroup', value: 'show_autogroup_get' },
 							// { name: 'Create Endpoint', value: 'create_endpoint_post' },
-							// { name: 'Show Endpoints', value: 'show_endpoints_get' },
+							{ name: 'Show Endpoints', value: 'show_endpoints_get' },
 							// { name: 'Delete Autogroup', value: 'delete_autogroup_delete' },
 							// { name: 'Update Autogroup', value: 'update_autogroup_put' },
 							// { name: 'Delete Endpoint', value: 'delete_endpoint_delete' },
@@ -149,9 +154,9 @@ export class VastAiNode implements INodeType {
 							// { name: 'Invite Team Member', value: 'invite_team_member_post' },
 							// { name: 'Remove Team Member', value: 'remove_team_member_delete' },
 							// { name: 'Remove Team Role', value: 'remove_team_role_delete' },
-							// { name: 'Show Team Members', value: 'show_team_members_get' },
+							{ name: 'Show Team Members', value: 'show_team_members_get' },
 							// { name: 'Update Team Role', value: 'update_team_role_put' },
-							// { name: 'Show Team Roles', value: 'show_team_roles_get' },
+							{ name: 'Show Team Roles', value: 'show_team_roles_get' },
 						];
 					case 'template':
 						return [
@@ -167,7 +172,7 @@ export class VastAiNode implements INodeType {
 						return [
 							// { name: 'Delete Volume', value: 'delete_volume_delete' },
 							// { name: 'Rent Volume', value: 'rent_volume_put' },
-							// { name: 'List Volumes', value: 'list_volumes_get' },
+							{ name: 'List Volumes', value: 'list_volumes_get' },
 							// { name: 'Search Volumes', value: 'search_volumes_post' },
 							// { name: 'Unlist Volume', value: 'unlist_volume_post' },
 						];
@@ -384,209 +389,107 @@ export class VastAiNode implements INodeType {
 	// You can make async calls and use `await`.
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const endPoint: string = "https://console.vast.ai/api/v0";
-		const apisMap: Record<string, string> = {
+		const apisMap: Record<string, ApiEndpoint> = {
 			// Instances
-			"attach_ssh_key_post": "",
-			"cancel_copy_delete": "",
-			"copy_put": "",
-			"cancel_sync_delete": "",
-			"cloud_copy_post": "",
-			"change_bid_put": "",
-			"create_instance_put": "",
-			"destroy_instance_delete": "",
-			"manage_instance_put": "",
-			"show_instance_get": "",
-			"detach_ssh_key_delete": "",
-			"execute_put": "",
-			"show_logs_put": "",
-			"prepay_instance_put": "",
-			"reboot_instance_put": "",
-			"recycle_instance_put": "",
-			"show_ssh_keys_get": "",
-			"show_instances_get": "",
+			"attach_ssh_key_post": { endpoint: "", method: "POST" },
+			"cancel_copy_delete": { endpoint: "", method: "DELETE" },
+			"copy_put": { endpoint: "", method: "PUT" },
+			"cancel_sync_delete": { endpoint: "", method: "DELETE" },
+			"cloud_copy_post": { endpoint: "", method: "POST" },
+			"change_bid_put": { endpoint: "", method: "PUT" },
+			"create_instance_put": { endpoint: "", method: "PUT" },
+			"destroy_instance_delete": { endpoint: "", method: "DELETE" },
+			"manage_instance_put": { endpoint: "", method: "PUT" },
+			"show_instance_get": { endpoint: "", method: "GET" },
+			"detach_ssh_key_delete": { endpoint: "", method: "DELETE" },
+			"execute_put": { endpoint: "", method: "PUT" },
+			"show_logs_put": { endpoint: "", method: "PUT" },
+			"prepay_instance_put": { endpoint: "", method: "PUT" },
+			"reboot_instance_put": { endpoint: "", method: "PUT" },
+			"recycle_instance_put": { endpoint: "", method: "PUT" },
+			"show_ssh_keys_get": { endpoint: "", method: "GET" },
+			"show_instances_get": { endpoint: "/instances/", method: "GET" },
 
 			// Machines
-			"cancel_maint_put": "",
-			"cleanup_machine_put": "",
-			"list_machine_put": "",
-			"remove_defjob_delete": "",
-			"show_reports_get": "",
-			"schedule_maint_put": "",
-			"set_defjob_put": "",
-			"set_min_bid_put": "",
-			"show_machines_get": "",
-			"unlist_machine_delete": "",
+			"cancel_maint_put": { endpoint: "", method: "PUT" },
+			"cleanup_machine_put": { endpoint: "", method: "PUT" },
+			"list_machine_put": { endpoint: "", method: "PUT" },
+			"remove_defjob_delete": { endpoint: "", method: "DELETE" },
+			"show_reports_get": { endpoint: "", method: "GET" },
+			"schedule_maint_put": { endpoint: "", method: "PUT" },
+			"set_defjob_put": { endpoint: "", method: "PUT" },
+			"set_min_bid_put": { endpoint: "", method: "PUT" },
+			"show_machines_get": { endpoint: "", method: "GET" },
+			"unlist_machine_delete": { endpoint: "", method: "DELETE" },
 
 			// Accounts
-			"create_api_key_post": "",
-			"show_api_keys_get": "/auth/apikeys/",
-			"create_env_var_post": "",
-			"delete_env_var_delete": "",
-			"show_env_vars_get": "/secrets/",
-			"update_env_var_put": "",
-			"create_ssh_key_post": "",
-			"create_subaccount_post": "",
-			"set_user_put": "",
-			"delete_api_key_delete": "",
-			"show_api_key_get": "",
-			"delete_ssh_key_delete": "",
-			"update_ssh_key_put": "",
-			"reset_api_key_put": "",
-			"show_connections_get": "/users/cloud_integrations/",
-			"show_ipaddrs_get": "",
-			"show_subaccounts_get": "/subaccounts/",
-			"show_team_role_get": "",
-			"show_user_get": "/users/current/",
-			"transfer_credit_put": "",
+			"create_api_key_post": { endpoint: "", method: "POST" },
+			"show_api_keys_get": { endpoint: "/auth/apikeys/", method: "GET" },
+			"create_env_var_post": { endpoint: "", method: "POST" },
+			"delete_env_var_delete": { endpoint: "", method: "DELETE" },
+			"show_env_vars_get": { endpoint: "/secrets/", method: "GET" },
+			"update_env_var_put": { endpoint: "", method: "PUT" },
+			"create_ssh_key_post": { endpoint: "", method: "POST" },
+			"create_subaccount_post": { endpoint: "", method: "POST" },
+			"set_user_put": { endpoint: "", method: "PUT" },
+			"delete_api_key_delete": { endpoint: "", method: "DELETE" },
+			"show_api_key_get": { endpoint: "", method: "GET" },
+			"delete_ssh_key_delete": { endpoint: "", method: "DELETE" },
+			"update_ssh_key_put": { endpoint: "", method: "PUT" },
+			"reset_api_key_put": { endpoint: "", method: "PUT" },
+			"show_connections_get": { endpoint: "/users/cloud_integrations/", method: "GET" },
+			"show_ipaddrs_get": { endpoint: "", method: "GET" },
+			"show_subaccounts_get": { endpoint: "/subaccounts/", method: "GET" },
+			"show_team_role_get": { endpoint: "", method: "GET" },
+			"show_user_get": { endpoint: "/users/current/", method: "GET" },
+			"transfer_credit_put": { endpoint: "", method: "PUT" },
 
 			// Serverless
-			"create_autogroup_post": "",
-			"show_autogroup_get": "",
-			"create_endpoint_post": "",
-			"show_endpoints_get": "",
-			"delete_autogroup_delete": "",
-			"update_autogroup_put": "",
-			"delete_endpoint_delete": "",
-			"update_endpoint_put": "",
-			"get_autogroup_logs_post": "",
-			"get_autogroup_workers_post": "",
-			"get_endpoint_logs_post": "",
-			"get_endpoint_workers_post": "",
-			"route_post": "",
+			"create_autogroup_post": { endpoint: "", method: "POST" },
+			"show_autogroup_get": { endpoint: "/autojobs/", method: "GET" },
+			"create_endpoint_post": { endpoint: "", method: "POST" },
+			"show_endpoints_get": { endpoint: "/endptjobs/", method: "GET" },
+			"delete_autogroup_delete": { endpoint: "", method: "DELETE" },
+			"update_autogroup_put": { endpoint: "", method: "PUT" },
+			"delete_endpoint_delete": { endpoint: "", method: "DELETE" },
+			"update_endpoint_put": { endpoint: "", method: "PUT" },
+			"get_autogroup_logs_post": { endpoint: "", method: "POST" },
+			"get_autogroup_workers_post": { endpoint: "", method: "POST" },
+			"get_endpoint_logs_post": { endpoint: "", method: "POST" },
+			"get_endpoint_workers_post": { endpoint: "", method: "POST" },
+			"route_post": { endpoint: "", method: "POST" },
 
 			// Team
-			"create_team_post": "",
-			"create_team_role_post": "",
-			"destroy_team_delete": "",
-			"invite_team_member_post": "",
-			"remove_team_member_delete": "",
-			"remove_team_role_delete": "",
-			"show_team_members_get": "",
-			"update_team_role_put": "",
-			"show_team_roles_get": "",
+			// "create_team_post": { endpoint: "", method: "POST" },
+			// "create_team_role_post": { endpoint: "", method: "POST" },
+			// "destroy_team_delete": { endpoint: "", method: "DELETE" },
+			// "invite_team_member_post": { endpoint: "", method: "POST" },
+			// "remove_team_member_delete": { endpoint: "", method: "DELETE" },
+			// "remove_team_role_delete": { endpoint: "", method: "DELETE" },
+			// "show_team_members_get": { endpoint: "/team/members/", method: "GET" },
+			// "update_team_role_put": { endpoint: "", method: "PUT" },
+			// "show_team_roles_get": { endpoint: "/team/roles-full/", method: "GET" },
 
 			// Template
-			"update_template_post": "",
+			"update_template_post": { endpoint: "", method: "POST" },
 
 			// Search
-			"search_templates_get": "",
-			"search_benchmarks_get": "",
-			"search_offers_put": "",
+			"search_templates_get": { endpoint: "", method: "GET" },
+			"search_benchmarks_get": { endpoint: "", method: "GET" },
+			"search_offers_put": { endpoint: "", method: "PUT" },
 
 			// Volumes
-			"delete_volume_delete": "",
-			"rent_volume_put": "",
-			"list_volumes_get": "",
-			"search_volumes_post": "",
-			"unlist_volume_post": "",
+			"delete_volume_delete": { endpoint: "", method: "DELETE" },
+			"rent_volume_put": { endpoint: "", method: "PUT" },
+			"list_volumes_get": { endpoint: "/volumes/", method: "GET" },
+			"search_volumes_post": { endpoint: "", method: "POST" },
+			"unlist_volume_post": { endpoint: "", method: "POST" },
 
 			// Billing
-			"search_invoices_get": "",
-			"show_deposit_get": "",
-			"show_earnings_get": "",
-			"show_invoice_get": ""
-		};
-		const apisReqMethodMap: Record<string, IHttpRequestMethods> = {
-			// Instances
-			"attach_ssh_key_post": "POST",
-			"cancel_copy_delete": "DELETE",
-			"copy_put": "PUT",
-			"cancel_sync_delete": "DELETE",
-			"cloud_copy_post": "POST",
-			"change_bid_put": "PUT",
-			"create_instance_put": "PUT",
-			"destroy_instance_delete": "DELETE",
-			"manage_instance_put": "PUT",
-			"show_instance_get": "GET",
-			"detach_ssh_key_delete": "DELETE",
-			"execute_put": "PUT",
-			"show_logs_put": "PUT",
-			"prepay_instance_put": "PUT",
-			"reboot_instance_put": "PUT",
-			"recycle_instance_put": "PUT",
-			"show_ssh_keys_get": "GET",
-			"show_instances_get": "GET",
-
-			// Machines
-			"cancel_maint_put": "PUT",
-			"cleanup_machine_put": "PUT",
-			"list_machine_put": "PUT",
-			"remove_defjob_delete": "DELETE",
-			"show_reports_get": "GET",
-			"schedule_maint_put": "PUT",
-			"set_defjob_put": "PUT",
-			"set_min_bid_put": "PUT",
-			"show_machines_get": "GET",
-			"unlist_machine_delete": "DELETE",
-
-			// Accounts
-			"create_api_key_post": "POST",
-			"show_api_keys_get": "GET",
-			"create_env_var_post": "POST",
-			"delete_env_var_delete": "DELETE",
-			"show_env_vars_get": "GET",
-			"update_env_var_put": "PUT",
-			"create_ssh_key_post": "POST",
-			"create_subaccount_post": "POST",
-			"set_user_put": "PUT",
-			"delete_api_key_delete": "DELETE",
-			"show_api_key_get": "GET",
-			"delete_ssh_key_delete": "DELETE",
-			"update_ssh_key_put": "PUT",
-			"reset_api_key_put": "PUT",
-			"show_connections_get": "GET",
-			"show_ipaddrs_get": "GET",
-			"show_subaccounts_get": "GET",
-			"show_team_role_get": "GET",
-			"show_user_get": "GET",
-			"transfer_credit_put": "PUT",
-
-			// Serverless
-			"create_autogroup_post": "POST",
-			"show_autogroup_get": "GET",
-			"create_endpoint_post": "POST",
-			"show_endpoints_get": "GET",
-			"delete_autogroup_delete": "DELETE",
-			"update_autogroup_put": "PUT",
-			"delete_endpoint_delete": "DELETE",
-			"update_endpoint_put": "PUT",
-			"get_autogroup_logs_post": "POST",
-			"get_autogroup_workers_post": "POST",
-			"get_endpoint_logs_post": "POST",
-			"get_endpoint_workers_post": "POST",
-			"route_post": "POST",
-
-			// Team
-			"create_team_post": "POST",
-			"create_team_role_post": "POST",
-			"destroy_team_delete": "DELETE",
-			"invite_team_member_post": "POST",
-			"remove_team_member_delete": "DELETE",
-			"remove_team_role_delete": "DELETE",
-			"show_team_members_get": "GET",
-			"update_team_role_put": "PUT",
-			"show_team_roles_get": "GET",
-
-			// Template
-			"update_template_post": "POST",
-
-			// Search
-			"search_templates_get": "GET",
-			"search_benchmarks_get": "GET",
-			"search_offers_put": "PUT",
-
-			// Volumes
-			"delete_volume_delete": "DELETE",
-			"rent_volume_put": "PUT",
-			"list_volumes_get": "GET",
-			"search_volumes_post": "POST",
-			"unlist_volume_post": "POST",
-
-			// Billing
-			"search_invoices_get": "GET",
-			"show_deposit_get": "GET",
-			"show_earnings_get": "GET",
-			"show_invoice_get": "GET"
+			"search_invoices_get": { endpoint: "", method: "GET" },
+			"show_deposit_get": { endpoint: "", method: "GET" },
+			"show_earnings_get": { endpoint: "", method: "GET" },
+			"show_invoice_get": { endpoint: "", method: "GET" }
 		}
 
 		const items = this.getInputData();
@@ -598,8 +501,9 @@ export class VastAiNode implements INodeType {
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 			try {
 				const selectedApi = this.getNodeParameter('api', itemIndex) as string;
-				let url: string = `${endPoint}${apisMap[selectedApi]}`;
-				let method: IHttpRequestMethods = apisReqMethodMap[selectedApi];
+				const apiConfig = apisMap[selectedApi];
+				let url: string = `${endPoint}${apiConfig.endpoint}`;
+				let method: IHttpRequestMethods = apiConfig.method;
 
 				// Lấy credentials đã được mã hóa
 				const credentials = await this.getCredentials('vastAICredentialsApi');
