@@ -3,7 +3,15 @@
   "version": "1.0.0",
   "description": "Using the Vast.AI API in an n8n environment.",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "vast.ai",
+    "vast",
+    "vast ai",
+    "vast-ai",
+    "vast.ai api",
+    "vast-ai api",
+    "vast ai api",
+    "gpu"
   ],
   "license": "MIT",
   "homepage": "https://truonghaidang.com",
