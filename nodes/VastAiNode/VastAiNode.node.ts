@@ -487,7 +487,7 @@ export class VastAiNode implements INodeType {
 
 			// Search
 			"search_benchmarks_get": { endpoint: "", method: "GET" },
-			"search_offers_put": { endpoint: "", method: "PUT" },
+			"search_offers_put": { endpoint: "/search/asks/", method: "PUT" },
 			"search_templates_get": { endpoint: "", method: "GET" },
 
 			// Serverless
@@ -529,6 +529,19 @@ export class VastAiNode implements INodeType {
 				let url: string = `${endPoint}${apiConfig.endpoint}`;
 				let method: IHttpRequestMethods = apiConfig.method;
 
+				// Trích xuất các param đã nhập trong phần Body
+				let rawBodyParams: Array<{ key: string; value: any }> = [];
+				const requestBody: Record<string, any> = {};
+				if (method !== 'GET') {
+					rawBodyParams = this.getNodeParameter('body.body', itemIndex, []) as Array<{ key: string; value: any }>;
+
+					for (const entry of rawBodyParams) {
+						if (entry.key !== '') {
+							requestBody[entry.key] = entry.value;
+						}
+					};
+				};
+
 				// Lấy credentials đã được mã hóa
 				const credentials = await this.getCredentials('vastAICredentialsApi');
 
@@ -541,9 +554,18 @@ export class VastAiNode implements INodeType {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${credentials.apiKey}`,
 					},
-
+					body: {},
 					json: true,
 				};
+
+				// Nếu là search_offers thì cần bọc vào "q"
+				if (selectedApi === 'search_offers_put') {
+					requestOptions.body = { q: requestBody };
+				} else {
+					requestOptions.body = requestBody;
+				}
+
+				console.log(requestOptions);
 
 				// Gọi API bằng httpRequest của n8n
 				const response = (await this.helpers.httpRequest.call(this, requestOptions)) as any;
