@@ -1,0 +1,17 @@
+export const createInstanceParams = [
+	{ name: 'Apikey_id', value: 'apikey_id' },
+	{ name: 'Cancel_unavail', value: 'cancel_unavail' },
+	{ name: 'Client_id', value: 'client_id' },
+	{ name: 'Extra_env', value: 'extra_env' },
+	{ name: 'ID', value: 'id' },
+	{ name: 'Image', value: 'image' },
+	{ name: 'Image_login', value: 'image_login' },
+	{ name: 'Label', value: 'label' },
+	{ name: 'Onstart', value: 'onstart' },
+	{ name: 'Price', value: 'price' },
+	{ name: 'Runtype', value: 'runtype' },
+	{ name: 'Target_state', value: 'target_state' },
+	{ name: 'Template_hash_id', value: 'template_hash_id' },
+	{ name: 'Template_id', value: 'template_id' },
+	{ name: 'Vm', value: 'vm' },
+];

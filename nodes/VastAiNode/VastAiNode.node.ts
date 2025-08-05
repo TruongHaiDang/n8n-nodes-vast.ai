@@ -9,6 +9,7 @@ import type {
 	IHttpRequestMethods
 } from 'n8n-workflow';
 import { searchOffersParams } from './SearchOffers';
+import { createInstanceParams } from './CreateInstance';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -239,7 +240,7 @@ export class VastAiNode implements INodeType {
 					case 'change_bid_put':
 						return [];
 					case 'create_instance_put':
-						return [];
+						return createInstanceParams;
 					case 'destroy_instance_delete':
 						return [];
 					case 'manage_instance_put':
@@ -461,7 +462,7 @@ export class VastAiNode implements INodeType {
 			"change_bid_put": { endpoint: "", method: "PUT" },
 			"cloud_copy_post": { endpoint: "", method: "POST" },
 			"copy_put": { endpoint: "", method: "PUT" },
-			"create_instance_put": { endpoint: "", method: "PUT" },
+			"create_instance_put": { endpoint: "/asks/{id}/", method: "PUT" },
 			"destroy_instance_delete": { endpoint: "", method: "DELETE" },
 			"detach_ssh_key_delete": { endpoint: "", method: "DELETE" },
 			"execute_put": { endpoint: "", method: "PUT" },
@@ -554,18 +555,27 @@ export class VastAiNode implements INodeType {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${credentials.apiKey}`,
 					},
-					body: {},
 					json: true,
 				};
 
 				// Nếu là search_offers thì cần bọc vào "q"
-				if (selectedApi === 'search_offers_put') {
-					requestOptions.body = { q: requestBody };
-				} else {
-					requestOptions.body = requestBody;
+				switch (selectedApi) {
+					case 'search_offers_put':
+						requestOptions.body = { q: requestBody };
+						break;
+					case 'create_instance_put':
+						const id = requestBody.id;
+						if (id == null || id === '') {
+							throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+						}
+						requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+						const { id: _, ...rest } = requestBody; // loại id khỏi body
+						requestOptions.body = rest;
+						break;
+					default:
+						requestOptions.body = requestBody;
+						break;
 				}
-
-				console.log(requestOptions);
 
 				// Gọi API bằng httpRequest của n8n
 				const response = (await this.helpers.httpRequest.call(this, requestOptions)) as any;
