@@ -8,8 +8,11 @@ import type {
 	IHttpRequestOptions,
 	IHttpRequestMethods
 } from 'n8n-workflow';
+
 import { searchOffersParams } from './SearchOffers';
 import { createInstanceParams } from './CreateInstance';
+import { destroyInstanceParams } from './DestroyInstance';
+import { showInstanceParams } from './ShowInstance';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -116,15 +119,15 @@ export class VastAiNode implements INodeType {
 							// { name: 'Change Bid', value: 'change_bid_put' },
 							// { name: 'Cloud Copy', value: 'cloud_copy_post' },
 							// { name: 'Copy', value: 'copy_put' },
-							// { name: 'Create Instance', value: 'create_instance_put' },
-							// { name: 'Destroy Instance', value: 'destroy_instance_delete' },
+							{ name: 'Create Instance', value: 'create_instance_put' },
+							{ name: 'Destroy Instance', value: 'destroy_instance_delete' },
 							// { name: 'Detach SSH Key', value: 'detach_ssh_key_delete' },
 							// { name: 'Execute', value: 'execute_put' },
 							// { name: 'Manage Instance', value: 'manage_instance_put' },
 							// { name: 'Prepay Instance', value: 'prepay_instance_put' },
 							// { name: 'Reboot Instance', value: 'reboot_instance_put' },
 							// { name: 'Recycle Instance', value: 'recycle_instance_put' },
-							// { name: 'Show Instance', value: 'show_instance_get' },
+							{ name: 'Show Instance', value: 'show_instance_get' },
 							{ name: 'Show Instances', value: 'show_instances_get' },
 							// { name: 'Show Logs', value: 'show_logs_put' },
 							// { name: 'Show SSH Keys', value: 'show_ssh_keys_get' },
@@ -242,11 +245,11 @@ export class VastAiNode implements INodeType {
 					case 'create_instance_put':
 						return createInstanceParams;
 					case 'destroy_instance_delete':
-						return [];
+						return destroyInstanceParams;
 					case 'manage_instance_put':
 						return [];
 					case 'show_instance_get':
-						return [];
+						return showInstanceParams;
 					case 'detach_ssh_key_delete':
 						return [];
 					case 'execute_put':
@@ -463,14 +466,14 @@ export class VastAiNode implements INodeType {
 			"cloud_copy_post": { endpoint: "", method: "POST" },
 			"copy_put": { endpoint: "", method: "PUT" },
 			"create_instance_put": { endpoint: "/asks/{id}/", method: "PUT" },
-			"destroy_instance_delete": { endpoint: "", method: "DELETE" },
+			"destroy_instance_delete": { endpoint: "/instances/{id}/", method: "DELETE" },
 			"detach_ssh_key_delete": { endpoint: "", method: "DELETE" },
 			"execute_put": { endpoint: "", method: "PUT" },
 			"manage_instance_put": { endpoint: "", method: "PUT" },
 			"prepay_instance_put": { endpoint: "", method: "PUT" },
 			"reboot_instance_put": { endpoint: "", method: "PUT" },
 			"recycle_instance_put": { endpoint: "", method: "PUT" },
-			"show_instance_get": { endpoint: "", method: "GET" },
+			"show_instance_get": { endpoint: "/instances/{id}/", method: "GET" },
 			"show_instances_get": { endpoint: "/instances/", method: "GET" },
 			"show_logs_put": { endpoint: "", method: "PUT" },
 
@@ -561,20 +564,44 @@ export class VastAiNode implements INodeType {
 				// Nếu là search_offers thì cần bọc vào "q"
 				switch (selectedApi) {
 					case 'search_offers_put':
-						requestOptions.body = { q: requestBody };
-						break;
+						{
+							requestOptions.body = { q: requestBody };
+							break;
+						}
 					case 'create_instance_put':
-						const id = requestBody.id;
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							const { id: _, ...rest } = requestBody; // loại id khỏi body
+							requestOptions.body = rest;
+							break;
+						}
+					case 'destroy_instance_delete':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'show_instance_get':
+					{
+						let id = requestBody.id;
 						if (id == null || id === '') {
 							throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
 						}
 						requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
-						const { id: _, ...rest } = requestBody; // loại id khỏi body
-						requestOptions.body = rest;
 						break;
+					}
 					default:
-						requestOptions.body = requestBody;
-						break;
+						{
+							requestOptions.body = requestBody;
+							break;
+						}
 				}
 
 				// Gọi API bằng httpRequest của n8n
