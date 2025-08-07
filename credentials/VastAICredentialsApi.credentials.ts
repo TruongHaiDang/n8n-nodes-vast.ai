@@ -9,7 +9,7 @@ export class VastAICredentialsApi implements ICredentialType {
 	name = 'vastAICredentialsApi';
 	displayName = 'Vast.AI Credentials API';
 
-	documentationUrl = 'https://your-docs-url';
+	documentationUrl = 'https://docs.vast.ai/api';
 
 	properties: INodeProperties[] = [
 		// The credentials to get from user and save encrypted.
