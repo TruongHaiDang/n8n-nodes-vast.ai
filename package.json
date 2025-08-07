@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-vast.ai",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Using the Vast.AI API in an n8n environment.",
   "keywords": [
     "n8n-community-node-package",
