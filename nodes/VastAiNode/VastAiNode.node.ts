@@ -9,10 +9,14 @@ import type {
 	IHttpRequestMethods
 } from 'n8n-workflow';
 
-import { searchOffersParams } from './SearchOffers';
-import { createInstanceParams } from './CreateInstance';
-import { destroyInstanceParams } from './DestroyInstance';
-import { showInstanceParams } from './ShowInstance';
+import { attachSSHKeyParams } from './Instances/AttachSSHKey';
+import { cancelCopyParams } from './Instances/CancelCopy';
+import { copyParams } from './Instances/Copy';
+import { cancelSyncParams } from './Instances/CancelSync';
+import { createInstanceParams } from './Instances/CreateInstance';
+import { destroyInstanceParams } from './Instances/DestroyInstance';
+import { showInstanceParams } from './Instances/ShowInstance';
+import { searchOffersParams } from './Search/SearchOffers';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -113,12 +117,12 @@ export class VastAiNode implements INodeType {
 				switch(resource) {
 					case 'instances':
 						return [
-							// { name: 'Attach SSH Key', value: 'attach_ssh_key_post' },
-							// { name: 'Cancel Copy', value: 'cancel_copy_delete' },
-							// { name: 'Cancel Sync', value: 'cancel_sync_delete' },
+							{ name: 'Attach SSH Key', value: 'attach_ssh_key_post' },
+							{ name: 'Cancel Copy', value: 'cancel_copy_delete' },
+							{ name: 'Cancel Sync', value: 'cancel_sync_delete' },
 							// { name: 'Change Bid', value: 'change_bid_put' },
 							// { name: 'Cloud Copy', value: 'cloud_copy_post' },
-							// { name: 'Copy', value: 'copy_put' },
+							{ name: 'Copy', value: 'copy_put' },
 							{ name: 'Create Instance', value: 'create_instance_put' },
 							{ name: 'Destroy Instance', value: 'destroy_instance_delete' },
 							// { name: 'Detach SSH Key', value: 'detach_ssh_key_delete' },
@@ -231,13 +235,13 @@ export class VastAiNode implements INodeType {
 				switch (api) {
 					// Instances cases
 					case 'attach_ssh_key_post':
-						return [];
+						return attachSSHKeyParams;
 					case 'cancel_copy_delete':
-						return [];
+						return cancelCopyParams;
 					case 'copy_put':
-						return [];
+						return copyParams;
 					case 'cancel_sync_delete':
-						return [];
+						return cancelSyncParams;
 					case 'cloud_copy_post':
 						return [];
 					case 'change_bid_put':
@@ -459,12 +463,12 @@ export class VastAiNode implements INodeType {
 			"show_invoice_get": { endpoint: "", method: "GET" },
 
 			// Instances
-			"attach_ssh_key_post": { endpoint: "", method: "POST" },
-			"cancel_copy_delete": { endpoint: "", method: "DELETE" },
-			"cancel_sync_delete": { endpoint: "", method: "DELETE" },
+			"attach_ssh_key_post": { endpoint: "/instances/{id}/ssh/", method: "POST" },
+			"cancel_copy_delete": { endpoint: "/commands/copy_direct/", method: "DELETE" },
+			"cancel_sync_delete": { endpoint: "/commands/rclone/", method: "DELETE" },
 			"change_bid_put": { endpoint: "", method: "PUT" },
 			"cloud_copy_post": { endpoint: "", method: "POST" },
-			"copy_put": { endpoint: "", method: "PUT" },
+			"copy_put": { endpoint: "/commands/copy_direct/", method: "PUT" },
 			"create_instance_put": { endpoint: "/asks/{id}/", method: "PUT" },
 			"destroy_instance_delete": { endpoint: "/instances/{id}/", method: "DELETE" },
 			"detach_ssh_key_delete": { endpoint: "", method: "DELETE" },
@@ -589,14 +593,25 @@ export class VastAiNode implements INodeType {
 							break;
 						}
 					case 'show_instance_get':
-					{
-						let id = requestBody.id;
-						if (id == null || id === '') {
-							throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
 						}
-						requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
-						break;
-					}
+					case 'attach_ssh_key_post':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							const { id: _, ...rest } = requestBody; // loại id khỏi body
+							requestOptions.body = rest;
+							break;
+						}
 					default:
 						{
 							requestOptions.body = requestBody;
