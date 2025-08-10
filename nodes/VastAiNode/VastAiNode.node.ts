@@ -27,6 +27,7 @@ import { rebootInstanceParams } from './Instances/RebootInstance';
 import { recycleInstanceParams } from './Instances/RecycleInstance';
 import { showSshKeysParams } from './Instances/ShowSshKeys';
 import { searchOffersParams } from './Search/SearchOffers';
+import { createTemplateParams } from './Template/CreateTemplate';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -68,7 +69,7 @@ export class VastAiNode implements INodeType {
 					{ name: 'Search', value: 'search' },
 					{ name: 'Serverless', value: 'serverless' },
 					// { name: 'Team', value: 'team' },
-					// { name: 'Template', value: 'template' },
+					{ name: 'Template', value: 'template' },
 					{ name: 'Volumes', value: 'volumes' },
 				],
 				default: 'accounts',
@@ -213,7 +214,7 @@ export class VastAiNode implements INodeType {
 						];
 					case 'template':
 						return [
-							// { name: 'Update Template', value: 'update_template_post' },
+							{ name: 'Create Template', value: 'create_template_post' },
 						];
 					case 'search':
 						return [
@@ -396,8 +397,8 @@ export class VastAiNode implements INodeType {
 						return [];
 
 					// Template cases
-					case 'update_template_post':
-						return [];
+					case 'create_template_post':
+						return createTemplateParams;
 
 					// Search cases
 					case 'search_templates_get':
@@ -525,7 +526,7 @@ export class VastAiNode implements INodeType {
 			"update_endpoint_put": { endpoint: "", method: "PUT" },
 
 			// Template
-			"update_template_post": { endpoint: "", method: "POST" },
+			"create_template_post": { endpoint: "/template/", method: "POST" },
 
 			// Volumes
 			"delete_volume_delete": { endpoint: "", method: "DELETE" },
