@@ -22,6 +22,10 @@ import { showLogsParams } from './Instances/ShowLogs';
 import { createInstanceParams } from './Instances/CreateInstance';
 import { destroyInstanceParams } from './Instances/DestroyInstance';
 import { showInstanceParams } from './Instances/ShowInstance';
+import { prepayInstanceParams } from './Instances/PrepayInstance';
+import { rebootInstanceParams } from './Instances/RebootInstance';
+import { recycleInstanceParams } from './Instances/RecycleInstance';
+import { showSshKeysParams } from './Instances/ShowSshKeys';
 import { searchOffersParams } from './Search/SearchOffers';
 
 interface ApiEndpoint {
@@ -134,13 +138,13 @@ export class VastAiNode implements INodeType {
 							{ name: 'Detach SSH Key', value: 'detach_ssh_key_delete' },
 							{ name: 'Execute', value: 'execute_put' },
 							{ name: 'Manage Instance', value: 'manage_instance_put' },
-							// { name: 'Prepay Instance', value: 'prepay_instance_put' },
-							// { name: 'Reboot Instance', value: 'reboot_instance_put' },
-							// { name: 'Recycle Instance', value: 'recycle_instance_put' },
+							{ name: 'Prepay Instance', value: 'prepay_instance_put' },
+							{ name: 'Reboot Instance', value: 'reboot_instance_put' },
+							{ name: 'Recycle Instance', value: 'recycle_instance_put' },
 							{ name: 'Show Instance', value: 'show_instance_get' },
 							{ name: 'Show Instances', value: 'show_instances_get' },
 							{ name: 'Show Logs', value: 'show_logs_put' },
-							// { name: 'Show SSH Keys', value: 'show_ssh_keys_get' },
+							{ name: 'Show SSH Keys', value: 'show_ssh_keys_get' },
 						];
 					case 'machines':
 						return [
@@ -171,7 +175,7 @@ export class VastAiNode implements INodeType {
 							{ name: 'Show Connections', value: 'show_connections_get' },
 							{ name: 'Show Env Vars', value: 'show_env_vars_get' },
 							// { name: 'Show Ipaddrs', value: 'show_ipaddrs_get' },
-							// { name: 'Show SSH Keys', value: 'show_ssh_keys_get' },
+							// { name: 'Show SSH Keys', value: 'acc_show_ssh_keys_get' },
 							{ name: 'Show Subaccounts', value: 'show_subaccounts_get' },
 							// { name: 'Show Team Role', value: 'show_team_role_get' },
 							{ name: 'Show User', value: 'show_user_get' },
@@ -267,13 +271,13 @@ export class VastAiNode implements INodeType {
 					case 'show_logs_put':
 						return showLogsParams;
 					case 'prepay_instance_put':
-						return [];
+						return prepayInstanceParams;
 					case 'reboot_instance_put':
-						return [];
+						return rebootInstanceParams;
 					case 'recycle_instance_put':
-						return [];
+						return recycleInstanceParams;
 					case 'show_ssh_keys_get':
-						return [];
+						return showSshKeysParams;
 					case 'show_instances_get':
 						return [];
 
@@ -314,7 +318,7 @@ export class VastAiNode implements INodeType {
 						return [];
 					case 'create_ssh_key_post':
 						return [];
-					case 'show_ssh_keys_get':
+					case 'acc_show_ssh_keys_get':
 						return [];
 					case 'create_subaccount_post':
 						return [];
@@ -454,7 +458,7 @@ export class VastAiNode implements INodeType {
 			"show_connections_get": { endpoint: "/users/cloud_integrations/", method: "GET" },
 			"show_env_vars_get": { endpoint: "/secrets/", method: "GET" },
 			"show_ipaddrs_get": { endpoint: "", method: "GET" },
-			"show_ssh_keys_get": { endpoint: "", method: "GET" },
+			"acc_show_ssh_keys_get": { endpoint: "", method: "GET" },
 			"show_subaccounts_get": { endpoint: "/subaccounts/", method: "GET" },
 			"show_team_role_get": { endpoint: "", method: "GET" },
 			"show_user_get": { endpoint: "/users/current/", method: "GET" },
@@ -480,12 +484,13 @@ export class VastAiNode implements INodeType {
 			"detach_ssh_key_delete": { endpoint: "/instances/{id}/ssh/{key}/", method: "DELETE" },
 			"execute_put": { endpoint: "/instances/command/{id}/", method: "PUT" },
 			"manage_instance_put": { endpoint: "/instances/{id}/", method: "PUT" },
-			"prepay_instance_put": { endpoint: "", method: "PUT" },
-			"reboot_instance_put": { endpoint: "", method: "PUT" },
-			"recycle_instance_put": { endpoint: "", method: "PUT" },
+			"prepay_instance_put": { endpoint: "/instances/prepay/{id}/", method: "PUT" },
+			"reboot_instance_put": { endpoint: "/instances/reboot/{id}/", method: "PUT" },
+			"recycle_instance_put": { endpoint: "/instances/recycle/{id}/", method: "PUT" },
 			"show_instance_get": { endpoint: "/instances/{id}/", method: "GET" },
 			"show_instances_get": { endpoint: "/instances/", method: "GET" },
 			"show_logs_put": { endpoint: "/instances/request_logs/{id}", method: "PUT" },
+			"show_ssh_keys_get": { endpoint: "/instances/{instance_id}/ssh/", method: "GET" },
 
 			// Machines
 			"cancel_maint_put": { endpoint: "", method: "PUT" },
@@ -674,6 +679,44 @@ export class VastAiNode implements INodeType {
 							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
 							const { id: _, ...rest } = requestBody; // loại id khỏi body
 							requestOptions.body = rest;
+							break;
+						}
+					case 'prepay_instance_put':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							const { id: _, ...rest } = requestBody; // loại id khỏi body
+							requestOptions.body = rest;
+							break;
+						}
+					case 'reboot_instance_put':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'recycle_instance_put':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'show_ssh_keys_get':
+						{
+							let instance_id = requestBody.instance_id;
+							if (instance_id == null || instance_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: instance_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{instance_id}', encodeURIComponent(String(instance_id)));
 							break;
 						}
 					default:
