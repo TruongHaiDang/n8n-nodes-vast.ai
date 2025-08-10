@@ -13,6 +13,12 @@ import { attachSSHKeyParams } from './Instances/AttachSSHKey';
 import { cancelCopyParams } from './Instances/CancelCopy';
 import { copyParams } from './Instances/Copy';
 import { cancelSyncParams } from './Instances/CancelSync';
+import { cloudCopyParams } from './Instances/CloudCopy';
+import { changeBidParams } from './Instances/ChangeBid';
+import { manageInstanceParams } from './Instances/ManageInstance';
+import { detachSshKeyParams } from './Instances/DetachSshKey';
+import { executeParams } from './Instances/Execute';
+import { showLogsParams } from './Instances/ShowLogs';
 import { createInstanceParams } from './Instances/CreateInstance';
 import { destroyInstanceParams } from './Instances/DestroyInstance';
 import { showInstanceParams } from './Instances/ShowInstance';
@@ -120,20 +126,20 @@ export class VastAiNode implements INodeType {
 							{ name: 'Attach SSH Key', value: 'attach_ssh_key_post' },
 							{ name: 'Cancel Copy', value: 'cancel_copy_delete' },
 							{ name: 'Cancel Sync', value: 'cancel_sync_delete' },
-							// { name: 'Change Bid', value: 'change_bid_put' },
-							// { name: 'Cloud Copy', value: 'cloud_copy_post' },
+							{ name: 'Change Bid', value: 'change_bid_put' },
+							{ name: 'Cloud Copy', value: 'cloud_copy_post' },
 							{ name: 'Copy', value: 'copy_put' },
 							{ name: 'Create Instance', value: 'create_instance_put' },
 							{ name: 'Destroy Instance', value: 'destroy_instance_delete' },
-							// { name: 'Detach SSH Key', value: 'detach_ssh_key_delete' },
-							// { name: 'Execute', value: 'execute_put' },
-							// { name: 'Manage Instance', value: 'manage_instance_put' },
+							{ name: 'Detach SSH Key', value: 'detach_ssh_key_delete' },
+							{ name: 'Execute', value: 'execute_put' },
+							{ name: 'Manage Instance', value: 'manage_instance_put' },
 							// { name: 'Prepay Instance', value: 'prepay_instance_put' },
 							// { name: 'Reboot Instance', value: 'reboot_instance_put' },
 							// { name: 'Recycle Instance', value: 'recycle_instance_put' },
 							{ name: 'Show Instance', value: 'show_instance_get' },
 							{ name: 'Show Instances', value: 'show_instances_get' },
-							// { name: 'Show Logs', value: 'show_logs_put' },
+							{ name: 'Show Logs', value: 'show_logs_put' },
 							// { name: 'Show SSH Keys', value: 'show_ssh_keys_get' },
 						];
 					case 'machines':
@@ -243,23 +249,23 @@ export class VastAiNode implements INodeType {
 					case 'cancel_sync_delete':
 						return cancelSyncParams;
 					case 'cloud_copy_post':
-						return [];
+						return cloudCopyParams;
 					case 'change_bid_put':
-						return [];
+						return changeBidParams;
 					case 'create_instance_put':
 						return createInstanceParams;
 					case 'destroy_instance_delete':
 						return destroyInstanceParams;
 					case 'manage_instance_put':
-						return [];
+						return manageInstanceParams;
 					case 'show_instance_get':
 						return showInstanceParams;
 					case 'detach_ssh_key_delete':
-						return [];
+						return detachSshKeyParams;
 					case 'execute_put':
-						return [];
+						return executeParams;
 					case 'show_logs_put':
-						return [];
+						return showLogsParams;
 					case 'prepay_instance_put':
 						return [];
 					case 'reboot_instance_put':
@@ -466,20 +472,20 @@ export class VastAiNode implements INodeType {
 			"attach_ssh_key_post": { endpoint: "/instances/{id}/ssh/", method: "POST" },
 			"cancel_copy_delete": { endpoint: "/commands/copy_direct/", method: "DELETE" },
 			"cancel_sync_delete": { endpoint: "/commands/rclone/", method: "DELETE" },
-			"change_bid_put": { endpoint: "", method: "PUT" },
-			"cloud_copy_post": { endpoint: "", method: "POST" },
+			"change_bid_put": { endpoint: "/instances/bid_price/{id}/", method: "PUT" },
+			"cloud_copy_post": { endpoint: "/commands/rclone/", method: "POST" },
 			"copy_put": { endpoint: "/commands/copy_direct/", method: "PUT" },
 			"create_instance_put": { endpoint: "/asks/{id}/", method: "PUT" },
 			"destroy_instance_delete": { endpoint: "/instances/{id}/", method: "DELETE" },
-			"detach_ssh_key_delete": { endpoint: "", method: "DELETE" },
-			"execute_put": { endpoint: "", method: "PUT" },
-			"manage_instance_put": { endpoint: "", method: "PUT" },
+			"detach_ssh_key_delete": { endpoint: "/instances/{id}/ssh/{key}/", method: "DELETE" },
+			"execute_put": { endpoint: "/instances/command/{id}/", method: "PUT" },
+			"manage_instance_put": { endpoint: "/instances/{id}/", method: "PUT" },
 			"prepay_instance_put": { endpoint: "", method: "PUT" },
 			"reboot_instance_put": { endpoint: "", method: "PUT" },
 			"recycle_instance_put": { endpoint: "", method: "PUT" },
 			"show_instance_get": { endpoint: "/instances/{id}/", method: "GET" },
 			"show_instances_get": { endpoint: "/instances/", method: "GET" },
-			"show_logs_put": { endpoint: "", method: "PUT" },
+			"show_logs_put": { endpoint: "/instances/request_logs/{id}", method: "PUT" },
 
 			// Machines
 			"cancel_maint_put": { endpoint: "", method: "PUT" },
@@ -602,6 +608,64 @@ export class VastAiNode implements INodeType {
 							break;
 						}
 					case 'attach_ssh_key_post':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							const { id: _, ...rest } = requestBody; // loại id khỏi body
+							requestOptions.body = rest;
+							break;
+						}
+					case 'change_bid_put':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							const { id: _, ...rest } = requestBody; // loại id khỏi body
+							requestOptions.body = rest;
+							break;
+						}
+					case 'manage_instance_put':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							const { id: _, ...rest } = requestBody; // loại id khỏi body
+							requestOptions.body = rest;
+							break;
+						}
+					case 'detach_ssh_key_delete':
+						{
+							let id = requestBody.id;
+							let key = requestBody.key;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							if (key == null || key === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: key', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							requestOptions.url = requestOptions.url.replace('{key}', encodeURIComponent(String(key)));
+							break;
+						}
+					case 'execute_put':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							const { id: _, ...rest } = requestBody; // loại id khỏi body
+							requestOptions.body = rest;
+							break;
+						}
+					case 'show_logs_put':
 						{
 							let id = requestBody.id;
 							if (id == null || id === '') {

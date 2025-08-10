@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-vast.ai",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Using the Vast.AI API in an n8n environment.",
   "keywords": [
     "n8n-community-node-package",
@@ -54,7 +54,7 @@
     "gulp": "^5.0.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "n8n-workflow": "*"
