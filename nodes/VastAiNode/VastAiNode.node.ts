@@ -27,6 +27,11 @@ import { rebootInstanceParams } from './Instances/RebootInstance';
 import { recycleInstanceParams } from './Instances/RecycleInstance';
 import { showSshKeysParams } from './Instances/ShowSshKeys';
 import { searchOffersParams } from './Search/SearchOffers';
+import { createTemplateParams } from './Template/CreateTemplate';
+import { searchInvoicesParams } from './Billing/SearchInvoices';
+import { showDepositParams } from './Billing/ShowDeposit';
+import { showEarningParams } from './Billing/ShowEarnings';
+import { showInvoicesParams } from './Billing/ShowInvoices';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -40,7 +45,8 @@ export class VastAiNode implements INodeType {
 		name: 'vastAiNode',
 		group: ['vast.ai'],
 		version: 1,
-		subtitle: '={{ $parameter["operation"] + ": " + $parameter["resource"] }}',
+		icon: 'file:VastAiNode.svg',
+		subtitle: '={{ $parameter["operation"] }}',
 		description: 'Get all informations of an account.',
 		defaults: {
 			name: 'Accounts',
@@ -56,23 +62,23 @@ export class VastAiNode implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Resource',
-				name: 'resource',
+				displayName: 'Operation',
+				name: 'operation',
 				type: 'options',
 				noDataExpression: true,
 				options: [
 					{ name: 'Accounts', value: 'accounts' },
-					// { name: 'Billing', value: 'billing' },
+					{ name: 'Billing', value: 'billing' },
 					{ name: 'Instances', value: 'instances' },
 					// { name: 'Machines', value: 'machines' },
 					{ name: 'Search', value: 'search' },
 					{ name: 'Serverless', value: 'serverless' },
 					// { name: 'Team', value: 'team' },
-					// { name: 'Template', value: 'template' },
+					{ name: 'Template', value: 'template' },
 					{ name: 'Volumes', value: 'volumes' },
 				],
 				default: 'accounts',
-				description: 'Select resource',
+				description: 'Select operation',
 			},
 			{
 				displayName: 'API Group Name or ID',
@@ -86,7 +92,7 @@ export class VastAiNode implements INodeType {
 			},
 			{
 				displayName: 'Body',
-				name: 'body',
+				name: 'properties',
 				type: 'fixedCollection',
 				typeOptions: {
 					multipleValues: true,
@@ -96,7 +102,7 @@ export class VastAiNode implements INodeType {
 				options: [
 					{
 						displayName: 'Body',
-						name: 'body',
+						name: 'properties',
 						values: [
 							{
 								displayName: 'Parameter Name or ID',
@@ -122,9 +128,9 @@ export class VastAiNode implements INodeType {
 	};
 	methods = {
 		loadOptions: {
-			async getApis(this: ILoadOptionsFunctions) {
-				const resource = this.getCurrentNodeParameter('resource');
-				switch(resource) {
+					async getApis(this: ILoadOptionsFunctions) {
+			const operation = this.getCurrentNodeParameter('operation');
+			switch(operation) {
 					case 'instances':
 						return [
 							{ name: 'Attach SSH Key', value: 'attach_ssh_key_post' },
@@ -213,7 +219,7 @@ export class VastAiNode implements INodeType {
 						];
 					case 'template':
 						return [
-							// { name: 'Update Template', value: 'update_template_post' },
+							{ name: 'Create Template', value: 'create_template_post' },
 						];
 					case 'search':
 						return [
@@ -231,10 +237,10 @@ export class VastAiNode implements INodeType {
 						];
 					case 'billing':
 						return [
-							// { name: 'Search Invoices', value: 'search_invoices_get' },
-							// { name: 'Show Deposit', value: 'show_deposit_get' },
-							// { name: 'Show Earnings', value: 'show_earnings_get' },
-							// { name: 'Show Invoice', value: 'show_invoice_get' },
+							{ name: 'Search Invoices', value: 'search_invoices_get' },
+							{ name: 'Show Deposit', value: 'show_deposit_get' },
+							{ name: 'Show Earnings', value: 'show_earnings_get' },
+							{ name: 'Show Invoice', value: 'show_invoice_get' },
 						];
 					default:
 						return [];
@@ -396,8 +402,8 @@ export class VastAiNode implements INodeType {
 						return [];
 
 					// Template cases
-					case 'update_template_post':
-						return [];
+					case 'create_template_post':
+						return createTemplateParams;
 
 					// Search cases
 					case 'search_templates_get':
@@ -421,13 +427,13 @@ export class VastAiNode implements INodeType {
 
 					// Billing cases
 					case 'search_invoices_get':
-						return [];
+						return searchInvoicesParams;
 					case 'show_deposit_get':
-						return [];
+						return showDepositParams;
 					case 'show_earnings_get':
-						return [];
+						return showEarningParams;
 					case 'show_invoice_get':
-						return [];
+						return showInvoicesParams;
 
 					default:
 						return [];
@@ -467,10 +473,10 @@ export class VastAiNode implements INodeType {
 			"update_ssh_key_put": { endpoint: "", method: "PUT" },
 
 			// Billing
-			"search_invoices_get": { endpoint: "", method: "GET" },
-			"show_deposit_get": { endpoint: "", method: "GET" },
-			"show_earnings_get": { endpoint: "", method: "GET" },
-			"show_invoice_get": { endpoint: "", method: "GET" },
+			"search_invoices_get": { endpoint: "/invoices", method: "GET" },
+			"show_deposit_get": { endpoint: "/{id}/", method: "GET" },
+			"show_earnings_get": { endpoint: "/users/{user_id}/machine-earnings/", method: "GET" },
+			"show_invoice_get": { endpoint: "/users/{user_id}/invoices/", method: "GET" },
 
 			// Instances
 			"attach_ssh_key_post": { endpoint: "/instances/{id}/ssh/", method: "POST" },
@@ -525,7 +531,7 @@ export class VastAiNode implements INodeType {
 			"update_endpoint_put": { endpoint: "", method: "PUT" },
 
 			// Template
-			"update_template_post": { endpoint: "", method: "POST" },
+			"create_template_post": { endpoint: "/template/", method: "POST" },
 
 			// Volumes
 			"delete_volume_delete": { endpoint: "", method: "DELETE" },
@@ -549,17 +555,26 @@ export class VastAiNode implements INodeType {
 				let method: IHttpRequestMethods = apiConfig.method;
 
 				// Trích xuất các param đã nhập trong phần Body
-				let rawBodyParams: Array<{ key: string; value: any }> = [];
+				let rawProperties: Array<{ key: string; value: any }> = [];
 				const requestBody: Record<string, any> = {};
+				const queryParams: Record<string, any> = {};
 				if (method !== 'GET') {
-					rawBodyParams = this.getNodeParameter('body.body', itemIndex, []) as Array<{ key: string; value: any }>;
+					rawProperties = this.getNodeParameter('properties.properties', itemIndex, []) as Array<{ key: string; value: any }>;
 
-					for (const entry of rawBodyParams) {
+					for (const entry of rawProperties) {
 						if (entry.key !== '') {
 							requestBody[entry.key] = entry.value;
 						}
 					};
-				};
+				} else {
+					rawProperties = this.getNodeParameter('properties.properties', itemIndex, []) as Array<{ key: string; value: any }>;
+					for (const entry of rawProperties) {
+						if (entry.key !== '') {
+							queryParams[entry.key] = entry.value;   // dùng cho query string
+							requestBody[entry.key] = entry.value;   // dùng cho path params {id}, {key}, ...
+						}
+					}
+				}
 
 				// Lấy credentials đã được mã hóa
 				const credentials = await this.getCredentials('vastAICredentialsApi');
@@ -717,6 +732,40 @@ export class VastAiNode implements INodeType {
 								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: instance_id', { itemIndex });
 							}
 							requestOptions.url = requestOptions.url.replace('{instance_id}', encodeURIComponent(String(instance_id)));
+							break;
+						}
+					case 'search_invoices_get':
+						{
+							requestOptions.qs = queryParams;
+							break;
+						}
+					case 'show_deposit_get':
+						{
+							let id = queryParams.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'show_earnings_get':
+						{
+							const { user_id, ...rest } = queryParams;
+							if (user_id == null || user_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: user_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{user_id}', encodeURIComponent(String(user_id)));
+							requestOptions.qs = rest;
+							break;
+						}
+					case 'show_invoice_get':
+						{
+							const { user_id, ...rest } = queryParams;
+							if (user_id == null || user_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: user_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{user_id}', encodeURIComponent(String(user_id)));
+							requestOptions.qs = rest;
 							break;
 						}
 					default:

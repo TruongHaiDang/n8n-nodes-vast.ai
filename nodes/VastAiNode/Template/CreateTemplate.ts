@@ -1,0 +1,15 @@
+export const createTemplateParams = [
+	{ name: 'DockerLoginRepo', value: 'docker_login_repo' },
+	{ name: 'Env', value: 'env' },
+	{ name: 'ExtraFilters', value: 'extra_filters' },
+	{ name: 'Image', value: 'image' },
+	{ name: 'JupDirect', value: 'jup_direct' },
+	{ name: 'JupyterDir', value: 'jupyter_dir' },
+	{ name: 'Onstart', value: 'onstart' },
+	{ name: 'RecommendedDiskSpace', value: 'recommended_disk_space' },
+	{ name: 'Runtype', value: 'runtype' },
+	{ name: 'SshDirect', value: 'ssh_direct' },
+	{ name: 'Tag', value: 'tag' },
+	{ name: 'UseJupyterLab', value: 'use_jupyter_lab' },
+	{ name: 'UseSsh', value: 'use_ssh' },
+];
