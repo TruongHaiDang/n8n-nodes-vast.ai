@@ -34,6 +34,10 @@ import { showEarningParams } from './Billing/ShowEarnings';
 import { showInvoicesParams } from './Billing/ShowInvoices';
 import { searchTemplatesParams } from './Search/SearchTemplates';
 import { searchBenchmarksParams } from './Search/SearchBenchmarks';
+import { deleteVolumeParams } from './Volumes/DeleteVolume';
+import { rentVolumeParams } from './Volumes/RentVolume';
+import { searchVolumesParams } from './Volumes/SearchVolumes';
+import { unlistVolumeParams } from './Volumes/UnlistVolume';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -231,11 +235,11 @@ export class VastAiNode implements INodeType {
 						];
 					case 'volumes':
 						return [
-							// { name: 'Delete Volume', value: 'delete_volume_delete' },
+							{ name: 'Delete Volume', value: 'delete_volume_delete' },
 							{ name: 'List Volumes', value: 'list_volumes_get' },
-							// { name: 'Rent Volume', value: 'rent_volume_put' },
-							// { name: 'Search Volumes', value: 'search_volumes_post' },
-							// { name: 'Unlist Volume', value: 'unlist_volume_post' },
+							{ name: 'Rent Volume', value: 'rent_volume_put' },
+							{ name: 'Search Volumes', value: 'search_volumes_post' },
+							{ name: 'Unlist Volume', value: 'unlist_volume_post' },
 						];
 					case 'billing':
 						return [
@@ -417,15 +421,15 @@ export class VastAiNode implements INodeType {
 
 					// Volumes cases
 					case 'delete_volume_delete':
-						return [];
+						return deleteVolumeParams;
 					case 'rent_volume_put':
-						return [];
+						return rentVolumeParams;
 					case 'list_volumes_get':
 						return [];
 					case 'search_volumes_post':
-						return [];
+						return searchVolumesParams;
 					case 'unlist_volume_post':
-						return [];
+						return unlistVolumeParams;
 
 					// Billing cases
 					case 'search_invoices_get':
@@ -536,11 +540,11 @@ export class VastAiNode implements INodeType {
 			"create_template_post": { endpoint: "/template/", method: "POST" },
 
 			// Volumes
-			"delete_volume_delete": { endpoint: "", method: "DELETE" },
+			"delete_volume_delete": { endpoint: "/volumes", method: "DELETE" },
 			"list_volumes_get": { endpoint: "/volumes/", method: "GET" },
-			"rent_volume_put": { endpoint: "", method: "PUT" },
-			"search_volumes_post": { endpoint: "", method: "POST" },
-			"unlist_volume_post": { endpoint: "", method: "POST" }
+			"rent_volume_put": { endpoint: "/volumes/", method: "PUT" },
+			"search_volumes_post": { endpoint: "/volumes/search/", method: "POST" },
+			"unlist_volume_post": { endpoint: "/volumes/unlist", method: "POST" }
 		}
 
 		const items = this.getInputData();
@@ -763,6 +767,34 @@ export class VastAiNode implements INodeType {
 							}
 							requestOptions.url = requestOptions.url.replace('{user_id}', encodeURIComponent(String(user_id)));
 							requestOptions.qs = rest;
+							break;
+						}
+					case 'delete_volume_delete':
+						{
+							requestOptions.body = { body: requestBody };
+							break;
+						}
+					case 'rent_volume_put':
+						{
+							requestOptions.body = { body: requestBody };
+							break;
+						}
+					case 'search_volumes_post':
+						{
+							const qPart = (requestBody as any).q;
+							const limitPart = (requestBody as any).limit;
+
+							if (qPart !== undefined) {
+								requestOptions.body = { q: qPart };
+							}
+							if (limitPart !== undefined) {
+								requestOptions.qs = { body: limitPart } as any;
+							}
+							break;
+						}
+					case 'unlist_volume_post':
+						{
+							requestOptions.body = { body: requestBody };
 							break;
 						}
 					default:
