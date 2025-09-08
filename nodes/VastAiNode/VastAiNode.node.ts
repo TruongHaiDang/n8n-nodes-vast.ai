@@ -32,6 +32,8 @@ import { searchInvoicesParams } from './Billing/SearchInvoices';
 import { showDepositParams } from './Billing/ShowDeposit';
 import { showEarningParams } from './Billing/ShowEarnings';
 import { showInvoicesParams } from './Billing/ShowInvoices';
+import { searchTemplatesParams } from './Search/SearchTemplates';
+import { searchBenchmarksParams } from './Search/SearchBenchmarks';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -223,9 +225,9 @@ export class VastAiNode implements INodeType {
 						];
 					case 'search':
 						return [
-							// { name: 'Search Benchmarks', value: 'search_benchmarks_get' },
+							{ name: 'Search Benchmarks', value: 'search_benchmarks_get' },
 							{ name: 'Search Offers', value: 'search_offers_put' },
-							// { name: 'Search Templates', value: 'search_templates_get' },
+							{ name: 'Search Templates', value: 'search_templates_get' },
 						];
 					case 'volumes':
 						return [
@@ -407,9 +409,9 @@ export class VastAiNode implements INodeType {
 
 					// Search cases
 					case 'search_templates_get':
-						return [];
+						return searchTemplatesParams;
 					case 'search_benchmarks_get':
-						return [];
+						return searchBenchmarksParams;
 					case 'search_offers_put':
 						return searchOffersParams;
 
@@ -511,9 +513,9 @@ export class VastAiNode implements INodeType {
 			"unlist_machine_delete": { endpoint: "", method: "DELETE" },
 
 			// Search
-			"search_benchmarks_get": { endpoint: "", method: "GET" },
+			"search_benchmarks_get": { endpoint: "/benchmarks/", method: "GET" },
 			"search_offers_put": { endpoint: "/search/asks/", method: "PUT" },
-			"search_templates_get": { endpoint: "", method: "GET" },
+			"search_templates_get": { endpoint: "/template/", method: "GET" },
 
 			// Serverless
 			"create_autogroup_post": { endpoint: "", method: "POST" },
@@ -734,11 +736,6 @@ export class VastAiNode implements INodeType {
 							requestOptions.url = requestOptions.url.replace('{instance_id}', encodeURIComponent(String(instance_id)));
 							break;
 						}
-					case 'search_invoices_get':
-						{
-							requestOptions.qs = queryParams;
-							break;
-						}
 					case 'show_deposit_get':
 						{
 							let id = queryParams.id;
@@ -770,7 +767,12 @@ export class VastAiNode implements INodeType {
 						}
 					default:
 						{
-							requestOptions.body = requestBody;
+							if (Object.keys(requestBody).length > 0) {
+								requestOptions.body = requestBody;
+							}
+							if (Object.keys(queryParams).length > 0) {
+								requestOptions.qs = queryParams;
+							}
 							break;
 						}
 				}
