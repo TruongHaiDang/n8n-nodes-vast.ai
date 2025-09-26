@@ -38,6 +38,9 @@ import { deleteVolumeParams } from './Volumes/DeleteVolume';
 import { rentVolumeParams } from './Volumes/RentVolume';
 import { searchVolumesParams } from './Volumes/SearchVolumes';
 import { unlistVolumeParams } from './Volumes/UnlistVolume';
+import { cancelMaintParams } from './Machines/CancelMaint';
+import { cleanupMachineParams } from './Machines/CleanupMachine';
+import { listMachineParams } from './Machines/ListMachine';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -76,7 +79,7 @@ export class VastAiNode implements INodeType {
 					{ name: 'Accounts', value: 'accounts' },
 					{ name: 'Billing', value: 'billing' },
 					{ name: 'Instances', value: 'instances' },
-					// { name: 'Machines', value: 'machines' },
+					{ name: 'Machines', value: 'machines' },
 					{ name: 'Search', value: 'search' },
 					{ name: 'Serverless', value: 'serverless' },
 					// { name: 'Team', value: 'team' },
@@ -160,9 +163,9 @@ export class VastAiNode implements INodeType {
 						];
 					case 'machines':
 						return [
-							// { name: 'Cancel Maint', value: 'cancel_maint_put' },
-							// { name: 'Cleanup Machine', value: 'cleanup_machine_put' },
-							// { name: 'List Machine', value: 'list_machine_put' },
+							{ name: 'Cancel Maint', value: 'cancel_maint_put' },
+							{ name: 'Cleanup Machine', value: 'cleanup_machine_put' },
+							{ name: 'List Machine', value: 'list_machine_put' },
 							// { name: 'Remove Defjob', value: 'remove_defjob_delete' },
 							// { name: 'Schedule Maint', value: 'schedule_maint_put' },
 							// { name: 'Set Defjob', value: 'set_defjob_put' },
@@ -295,11 +298,11 @@ export class VastAiNode implements INodeType {
 
 					// Machines cases
 					case 'cancel_maint_put':
-						return [];
+						return cancelMaintParams;
 					case 'cleanup_machine_put':
-						return [];
+						return cleanupMachineParams;
 					case 'list_machine_put':
-						return [];
+						return listMachineParams;
 					case 'remove_defjob_delete':
 						return [];
 					case 'show_reports_get':
@@ -505,9 +508,9 @@ export class VastAiNode implements INodeType {
 			"show_ssh_keys_get": { endpoint: "/instances/{instance_id}/ssh/", method: "GET" },
 
 			// Machines
-			"cancel_maint_put": { endpoint: "", method: "PUT" },
-			"cleanup_machine_put": { endpoint: "", method: "PUT" },
-			"list_machine_put": { endpoint: "", method: "PUT" },
+			"cancel_maint_put": { endpoint: "/machines/{machine_id}/cancel_maint", method: "PUT" },
+			"cleanup_machine_put": { endpoint: "/machines/{machine_id}/cleanup", method: "PUT" },
+			"list_machine_put": { endpoint: "/machines/create_asks/", method: "PUT" },
 			"remove_defjob_delete": { endpoint: "", method: "DELETE" },
 			"schedule_maint_put": { endpoint: "", method: "PUT" },
 			"set_defjob_put": { endpoint: "", method: "PUT" },
@@ -795,6 +798,24 @@ export class VastAiNode implements INodeType {
 					case 'unlist_volume_post':
 						{
 							requestOptions.body = { body: requestBody };
+							break;
+						}
+					case 'cancel_maint_put':
+						{
+							let machine_id = queryParams.machine_id;
+							if (machine_id == null || machine_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{machine_id}', encodeURIComponent(String(machine_id)));
+							break;
+						}
+					case 'cleanup_machine_put':
+						{
+							let machine_id = queryParams.machine_id;
+							if (machine_id == null || machine_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{machine_id}', encodeURIComponent(String(machine_id)));
 							break;
 						}
 					default:
