@@ -1,0 +1,101 @@
+# This workflow sends notifications to a Telegram channel whenever a release is published or a tag is pushed.
+name: Notify Telegram on release or tag
+
+on:
+  # Trigger when a release is published.
+  release:
+    types:
+      - published
+  # Trigger when any tag is pushed to the repository.
+  push:
+    tags:
+      - '*'
+
+jobs:
+  notify-telegram:
+    # Use the latest Ubuntu runner for best compatibility and performance.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare notification message
+        # Generate a concise message describing the release or tag event.
+        id: prepare
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: |
+          python <<'PY'
+          """Build a Telegram message summarizing the current GitHub event."""
+          import json
+          import os
+          import pathlib
+
+          # Load environment context for the current GitHub event.
+          event_name = os.environ["GITHUB_EVENT_NAME"]
+          event_path = os.environ["GITHUB_EVENT_PATH"]
+          repository = os.environ["GITHUB_REPOSITORY"]
+          actor = os.environ["GITHUB_ACTOR"]
+
+          # Read the GitHub event payload for detailed information.
+          with open(event_path, "r", encoding="utf-8") as handle:
+            event = json.load(handle)
+
+          # Decide which message to send based on the event type.
+          if event_name == "release":
+            release = event["release"]
+            release_name = release.get("name") or release.get("tag_name")
+            tag_name = release.get("tag_name")
+            html_url = release.get("html_url")
+            # Use explicit join to guarantee a single string payload for GitHub Actions outputs.
+            message = "".join(
+              (
+                "🚀 New release published\n",
+                f"Repository: {repository}\n",
+                f"Release: {release_name}\n",
+                f"Tag: {tag_name}\n",
+                f"Published by: {actor}\n",
+                f"Details: {html_url}",
+              )
+            )
+          else:
+            ref = event.get("ref", "")
+            tag_name = ref.split("/")[-1] if ref else ""
+            html_url = f"https://github.com/{repository}/releases/tag/{tag_name}"
+            # Compose the tag notification text in a deterministic order for clarity and reliability.
+            message = "".join(
+              (
+                "🏷️ New tag pushed\n",
+                f"Repository: {repository}\n",
+                f"Tag: {tag_name}\n",
+                f"Pushed by: {actor}\n",
+                f"Details: {html_url}",
+              )
+            )
+
+          # Persist the message to the step output for downstream usage.
+          output_path = pathlib.Path(os.environ["GITHUB_OUTPUT"])
+          with open(output_path, "w", encoding="utf-8") as output_file:
+            output_file.write("message<<EOF\n")
+            output_file.write(message)
+            output_file.write("\nEOF\n")
+          PY
+
+      - name: Send Telegram notification
+        # Send the prepared message to the configured Telegram chat.
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_MESSAGE: ${{ steps.prepare.outputs.message }}
+        run: |
+          # Fail fast if required secrets are missing to avoid silent errors.
+          set -euo pipefail
+          if [ -z "${TELEGRAM_BOT_TOKEN}" ] || [ -z "${TELEGRAM_CHAT_ID}" ]; then
+            echo "TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID secrets must be provided." >&2
+            exit 1
+          fi
+
+          # Deliver the notification message to Telegram using the Bot API.
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=${TELEGRAM_MESSAGE}"
