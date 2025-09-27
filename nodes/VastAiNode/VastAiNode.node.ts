@@ -41,6 +41,13 @@ import { unlistVolumeParams } from './Volumes/UnlistVolume';
 import { cancelMaintParams } from './Machines/CancelMaint';
 import { cleanupMachineParams } from './Machines/CleanupMachine';
 import { listMachineParams } from './Machines/ListMachine';
+import { removeDefjobParams } from './Machines/RemoveDefjob';
+import { showReportsParams } from './Machines/ShowReports';
+import { scheduleMaintParams } from './Machines/ScheduleMaint';
+import { setDefjobParams } from './Machines/SetDefjob';
+import { setMinBidParams } from './Machines/setMinBid';
+import { showMachinesParams } from './Machines/ShowMachines';
+import { unlistMachineParams } from './Machines/UnlistMachine';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -166,13 +173,13 @@ export class VastAiNode implements INodeType {
 							{ name: 'Cancel Maint', value: 'cancel_maint_put' },
 							{ name: 'Cleanup Machine', value: 'cleanup_machine_put' },
 							{ name: 'List Machine', value: 'list_machine_put' },
-							// { name: 'Remove Defjob', value: 'remove_defjob_delete' },
-							// { name: 'Schedule Maint', value: 'schedule_maint_put' },
-							// { name: 'Set Defjob', value: 'set_defjob_put' },
-							// { name: 'Set Min Bid', value: 'set_min_bid_put' },
-							// { name: 'Show Machines', value: 'show_machines_get' },
-							// { name: 'Show Reports', value: 'show_reports_get' },
-							// { name: 'Unlist Machine', value: 'unlist_machine_delete' },
+							{ name: 'Remove Defjob', value: 'remove_defjob_delete' },
+							{ name: 'Schedule Maint', value: 'schedule_maint_put' },
+							{ name: 'Set Defjob', value: 'set_defjob_put' },
+							{ name: 'Set Min Bid', value: 'set_min_bid_put' },
+							{ name: 'Show Machines', value: 'show_machines_get' },
+							{ name: 'Show Reports', value: 'show_reports_get' },
+							{ name: 'Unlist Machine', value: 'unlist_machine_delete' },
 						];
 					case 'accounts':
 						return [
@@ -304,19 +311,19 @@ export class VastAiNode implements INodeType {
 					case 'list_machine_put':
 						return listMachineParams;
 					case 'remove_defjob_delete':
-						return [];
+						return removeDefjobParams;
 					case 'show_reports_get':
-						return [];
+						return showReportsParams;
 					case 'schedule_maint_put':
-						return [];
+						return scheduleMaintParams;
 					case 'set_defjob_put':
-						return [];
+						return setDefjobParams;
 					case 'set_min_bid_put':
-						return [];
+						return setMinBidParams;
 					case 'show_machines_get':
-						return [];
+						return showMachinesParams;
 					case 'unlist_machine_delete':
-						return [];
+						return unlistMachineParams;
 
 					// Accounts cases
 					case 'create_api_key_post':
@@ -511,13 +518,13 @@ export class VastAiNode implements INodeType {
 			"cancel_maint_put": { endpoint: "/machines/{machine_id}/cancel_maint", method: "PUT" },
 			"cleanup_machine_put": { endpoint: "/machines/{machine_id}/cleanup", method: "PUT" },
 			"list_machine_put": { endpoint: "/machines/create_asks/", method: "PUT" },
-			"remove_defjob_delete": { endpoint: "", method: "DELETE" },
-			"schedule_maint_put": { endpoint: "", method: "PUT" },
-			"set_defjob_put": { endpoint: "", method: "PUT" },
-			"set_min_bid_put": { endpoint: "", method: "PUT" },
-			"show_machines_get": { endpoint: "", method: "GET" },
-			"show_reports_get": { endpoint: "", method: "GET" },
-			"unlist_machine_delete": { endpoint: "", method: "DELETE" },
+			"remove_defjob_delete": { endpoint: "/machines/{machine_id}/defjob", method: "DELETE" },
+			"schedule_maint_put": { endpoint: "/machines/{machine_id}/dnotify", method: "PUT" },
+			"set_defjob_put": { endpoint: "/machines/create_bids/", method: "PUT" },
+			"set_min_bid_put": { endpoint: "/machines/{machine_id}/minbid", method: "PUT" },
+			"show_machines_get": { endpoint: "/machines/", method: "GET" },
+			"show_reports_get": { endpoint: "/machines/{machine_id}/reports", method: "GET" },
+			"unlist_machine_delete": { endpoint: "/machines/{machine_id}/asks", method: "DELETE" },
 
 			// Search
 			"search_benchmarks_get": { endpoint: "/benchmarks/", method: "GET" },
@@ -754,22 +761,22 @@ export class VastAiNode implements INodeType {
 						}
 					case 'show_earnings_get':
 						{
-							const { user_id, ...rest } = queryParams;
+							const user_id = queryParams.user_id;
 							if (user_id == null || user_id === '') {
 								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: user_id', { itemIndex });
 							}
 							requestOptions.url = requestOptions.url.replace('{user_id}', encodeURIComponent(String(user_id)));
-							requestOptions.qs = rest;
+							requestOptions.qs = requestBody;
 							break;
 						}
 					case 'show_invoice_get':
 						{
-							const { user_id, ...rest } = queryParams;
+							const user_id = queryParams.user_id;
 							if (user_id == null || user_id === '') {
 								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: user_id', { itemIndex });
 							}
 							requestOptions.url = requestOptions.url.replace('{user_id}', encodeURIComponent(String(user_id)));
-							requestOptions.qs = rest;
+							requestOptions.qs = requestBody;
 							break;
 						}
 					case 'delete_volume_delete':
@@ -802,7 +809,7 @@ export class VastAiNode implements INodeType {
 						}
 					case 'cancel_maint_put':
 						{
-							let machine_id = queryParams.machine_id;
+							let machine_id = requestBody.machine_id;
 							if (machine_id == null || machine_id === '') {
 								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
 							}
@@ -811,7 +818,63 @@ export class VastAiNode implements INodeType {
 						}
 					case 'cleanup_machine_put':
 						{
+							let machine_id = requestBody.machine_id;
+							if (machine_id == null || machine_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{machine_id}', encodeURIComponent(String(machine_id)));
+							break;
+						}
+					case 'remove_defjob_delete':
+						{
+							let machine_id = requestBody.machine_id;
+							if (machine_id == null || machine_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{machine_id}', encodeURIComponent(String(machine_id)));
+							break;
+						}
+					case 'show_reports_get':
+						{
 							let machine_id = queryParams.machine_id;
+							if (machine_id == null || machine_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{machine_id}', encodeURIComponent(String(machine_id)));
+							break;
+						}
+					case 'schedule_maint_put':
+						{
+							let {machine_id, ...rest} = requestBody;
+							if (machine_id == null || machine_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{machine_id}', encodeURIComponent(String(machine_id)));
+							requestOptions.body = rest;
+							break;
+						}
+					case 'set_min_bid_put':
+						{
+							let {machine_id, ...rest} = requestBody;
+							if (machine_id == null || machine_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{machine_id}', encodeURIComponent(String(machine_id)));
+							requestOptions.body = rest;
+							break;
+						}
+					case 'show_machines_get':
+						{
+							let user_id = queryParams.user_id;
+							if (user_id == null || user_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: user_id', { itemIndex });
+							}
+							requestOptions.qs = queryParams;
+							break;
+						}
+					case 'unlist_machine_delete':
+						{
+							let machine_id = requestBody.machine_id;
 							if (machine_id == null || machine_id === '') {
 								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
 							}

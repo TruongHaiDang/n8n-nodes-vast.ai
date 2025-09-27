@@ -1,4 +1,3 @@
-// search_offers.ts
 export const listMachineParams = [
   { name: 'Machine', value: 'machine' },
   { name: 'Price Gpu', value: 'price_gpu' },
