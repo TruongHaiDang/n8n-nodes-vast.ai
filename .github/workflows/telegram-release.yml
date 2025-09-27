@@ -47,24 +47,30 @@ jobs:
             release_name = release.get("name") or release.get("tag_name")
             tag_name = release.get("tag_name")
             html_url = release.get("html_url")
-            message = (
-              "🚀 New release published\n"
-              f"Repository: {repository}\n"
-              f"Release: {release_name}\n"
-              f"Tag: {tag_name}\n"
-              f"Published by: {actor}\n"
-              f"Details: {html_url}"
+            # Use explicit join to guarantee a single string payload for GitHub Actions outputs.
+            message = "".join(
+              (
+                "🚀 New release published\n",
+                f"Repository: {repository}\n",
+                f"Release: {release_name}\n",
+                f"Tag: {tag_name}\n",
+                f"Published by: {actor}\n",
+                f"Details: {html_url}",
+              )
             )
           else:
             ref = event.get("ref", "")
             tag_name = ref.split("/")[-1] if ref else ""
             html_url = f"https://github.com/{repository}/releases/tag/{tag_name}"
-            message = (
-              "🏷️ New tag pushed\n"
-              f"Repository: {repository}\n"
-              f"Tag: {tag_name}\n"
-              f"Pushed by: {actor}\n"
-              f"Details: {html_url}"
+            # Compose the tag notification text in a deterministic order for clarity and reliability.
+            message = "".join(
+              (
+                "🏷️ New tag pushed\n",
+                f"Repository: {repository}\n",
+                f"Tag: {tag_name}\n",
+                f"Pushed by: {actor}\n",
+                f"Details: {html_url}",
+              )
             )
 
           # Persist the message to the step output for downstream usage.
