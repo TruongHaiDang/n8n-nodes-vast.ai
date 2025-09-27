@@ -48,6 +48,7 @@ import { setDefjobParams } from './Machines/SetDefjob';
 import { setMinBidParams } from './Machines/setMinBid';
 import { showMachinesParams } from './Machines/ShowMachines';
 import { unlistMachineParams } from './Machines/UnlistMachine';
+import { createApiKeyParams } from './Accounts/CreateApiKey';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -183,7 +184,7 @@ export class VastAiNode implements INodeType {
 						];
 					case 'accounts':
 						return [
-							// { name: 'Create API Key', value: 'create_api_key_post' },
+							{ name: 'Create API Key', value: 'create_api_key_post' },
 							// { name: 'Create Env Var', value: 'create_env_var_post' },
 							// { name: 'Create SSH Key', value: 'create_ssh_key_post' },
 							// { name: 'Create Subaccount', value: 'create_subaccount_post' },
@@ -327,7 +328,7 @@ export class VastAiNode implements INodeType {
 
 					// Accounts cases
 					case 'create_api_key_post':
-						return [];
+						return createApiKeyParams;
 					case 'show_api_keys_get':
 						return [];
 					case 'create_env_var_post':
@@ -466,7 +467,7 @@ export class VastAiNode implements INodeType {
 		const endPoint: string = "https://console.vast.ai/api/v0";
 		const apisMap: Record<string, ApiEndpoint> = {
 			// Accounts
-			"create_api_key_post": { endpoint: "", method: "POST" },
+			"create_api_key_post": { endpoint: "/auth/apikeys/", method: "POST" },
 			"create_env_var_post": { endpoint: "", method: "POST" },
 			"create_ssh_key_post": { endpoint: "", method: "POST" },
 			"create_subaccount_post": { endpoint: "", method: "POST" },
@@ -574,20 +575,37 @@ export class VastAiNode implements INodeType {
 				let rawProperties: Array<{ key: string; value: any }> = [];
 				const requestBody: Record<string, any> = {};
 				const queryParams: Record<string, any> = {};
-				if (method !== 'GET') {
-					rawProperties = this.getNodeParameter('properties.properties', itemIndex, []) as Array<{ key: string; value: any }>;
 
-					for (const entry of rawProperties) {
-						if (entry.key !== '') {
-							requestBody[entry.key] = entry.value;
+				const parseValue = (value: any): any => {
+					if (typeof value === 'string') {
+						try {
+							const parsed = JSON.parse(value);
+							// Nếu parse ra array hoặc object thì trả về, ngược lại trả về string gốc
+							if (typeof parsed === 'object' && parsed !== null) {
+								return parsed;
+							}
+						} catch (e) {
+							// Không parse được thì trả về string gốc
+							return value;
 						}
-					};
-				} else {
-					rawProperties = this.getNodeParameter('properties.properties', itemIndex, []) as Array<{ key: string; value: any }>;
+					}
+					return value;
+				};
+
+				rawProperties = this.getNodeParameter('properties.properties', itemIndex, []) as Array<{ key: string; value: any }>;
+
+				if (method !== 'GET') {
 					for (const entry of rawProperties) {
 						if (entry.key !== '') {
-							queryParams[entry.key] = entry.value;   // dùng cho query string
-							requestBody[entry.key] = entry.value;   // dùng cho path params {id}, {key}, ...
+							requestBody[entry.key] = parseValue(entry.value);
+						}
+					}
+				} else {
+					for (const entry of rawProperties) {
+						if (entry.key !== '') {
+							const parsedValue = parseValue(entry.value);
+							queryParams[entry.key] = parsedValue;   // dùng cho query string
+							requestBody[entry.key] = parsedValue;   // dùng cho path params {id}, {key}, ...
 						}
 					}
 				}
