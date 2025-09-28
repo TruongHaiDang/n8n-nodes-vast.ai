@@ -63,6 +63,17 @@ import { resetApiKeyParams } from './Accounts/ResetAPIKey';
 import { showIpaddrsParams } from './Accounts/ShowIpaddrs';
 import { showTeamRoleParams } from './Accounts/ShowTeamRole';
 import { transferCreditParams } from './Accounts/TransferCredit';
+import { createWorkergroupParams } from './Serverless/CreateWorkergroup';
+import { createEndpointParams } from './Serverless/CreateEndpoint';
+import { deleteWorkergroupParams } from './Serverless/DeleteWorkergroup';
+import { updateWorkergroupParams } from './Serverless/UpdateWorkergroup';
+import { deleteEndpointParams } from './Serverless/DeleteEndpoint';
+import { updateEndpointParams } from './Serverless/UpdateEndpoint';
+import { getWorkergroupLogsParams } from './Serverless/GetWorkergroupLogs';
+import { getWorkergroupWorkersParams } from './Serverless/GetWorkergroupWorkers';
+import { getEndpointLogsParams } from './Serverless/GetEndpointLogs';
+import { getEndpointWorkersParams } from './Serverless/GetEndpointWorkers';
+import { routeParams } from './Serverless/Route';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -222,19 +233,19 @@ export class VastAiNode implements INodeType {
 						];
 					case 'serverless':
 						return [
-							// { name: 'Create Autogroup', value: 'create_autogroup_post' },
-							// { name: 'Create Endpoint', value: 'create_endpoint_post' },
-							// { name: 'Delete Autogroup', value: 'delete_autogroup_delete' },
-							// { name: 'Delete Endpoint', value: 'delete_endpoint_delete' },
-							// { name: 'Get Autogroup Logs', value: 'get_autogroup_logs_post' },
-							// { name: 'Get Autogroup Workers', value: 'get_autogroup_workers_post' },
-							// { name: 'Get Endpoint Logs', value: 'get_endpoint_logs_post' },
-							// { name: 'Get Endpoint Workers', value: 'get_endpoint_workers_post' },
-							// { name: 'Route', value: 'route_post' },
-							{ name: 'Show Autogroup', value: 'show_autogroup_get' },
+							{ name: 'Create Workergroup', value: 'create_workergroup_post' },
+							{ name: 'Create Endpoint', value: 'create_endpoint_post' },
+							{ name: 'Delete Workergroup', value: 'delete_workergroup_delete' },
+							{ name: 'Delete Endpoint', value: 'delete_endpoint_delete' },
+							{ name: 'Get Workergroup Logs', value: 'get_workergroup_logs_post' },
+							{ name: 'Get Workergroup Workers', value: 'get_workergroup_workers_post' },
+							{ name: 'Get Endpoint Logs', value: 'get_endpoint_logs_post' },
+							{ name: 'Get Endpoint Workers', value: 'get_endpoint_workers_post' },
+							{ name: 'Route', value: 'route_post' },
+							{ name: 'Show Workergroup', value: 'show_workergroup_get' },
 							{ name: 'Show Endpoints', value: 'show_endpoints_get' },
-							// { name: 'Update Autogroup', value: 'update_autogroup_put' },
-							// { name: 'Update Endpoint', value: 'update_endpoint_put' },
+							{ name: 'Update Workergroup', value: 'update_workergroup_put' },
+							{ name: 'Update Endpoint', value: 'update_endpoint_put' },
 						];
 					case 'team':
 						return [
@@ -385,32 +396,32 @@ export class VastAiNode implements INodeType {
 						return transferCreditParams;
 
 					// Serverless cases
-					case 'create_autogroup_post':
-						return [];
-					case 'show_autogroup_get':
+					case 'create_workergroup_post':
+						return createWorkergroupParams;
+					case 'show_workergroup_get':
 						return [];
 					case 'create_endpoint_post':
-						return [];
+						return createEndpointParams;
 					case 'show_endpoints_get':
 						return [];
-					case 'delete_autogroup_delete':
-						return [];
-					case 'update_autogroup_put':
-						return [];
+					case 'delete_workergroup_delete':
+						return deleteWorkergroupParams;
+					case 'update_workergroup_put':
+						return updateWorkergroupParams;
 					case 'delete_endpoint_delete':
-						return [];
+						return deleteEndpointParams;
 					case 'update_endpoint_put':
-						return [];
-					case 'get_autogroup_logs_post':
-						return [];
-					case 'get_autogroup_workers_post':
-						return [];
+						return updateEndpointParams;
+					case 'get_workergroup_logs_post':
+						return getWorkergroupLogsParams;
+					case 'get_workergroup_workers_post':
+						return getWorkergroupWorkersParams;
 					case 'get_endpoint_logs_post':
-						return [];
+						return getEndpointLogsParams;
 					case 'get_endpoint_workers_post':
-						return [];
+						return getEndpointWorkersParams;
 					case 'route_post':
-						return [];
+						return routeParams;
 
 					// Team cases
 					case 'create_team_post':
@@ -547,19 +558,19 @@ export class VastAiNode implements INodeType {
 			"search_templates_get": { endpoint: "/template/", method: "GET" },
 
 			// Serverless
-			"create_autogroup_post": { endpoint: "", method: "POST" },
-			"create_endpoint_post": { endpoint: "", method: "POST" },
-			"delete_autogroup_delete": { endpoint: "", method: "DELETE" },
-			"delete_endpoint_delete": { endpoint: "", method: "DELETE" },
-			"get_autogroup_logs_post": { endpoint: "", method: "POST" },
-			"get_autogroup_workers_post": { endpoint: "", method: "POST" },
+			"create_workergroup_post": { endpoint: "/workergroups/", method: "POST" },
+			"create_endpoint_post": { endpoint: "/endptjobs/", method: "POST" },
+			"delete_workergroup_delete": { endpoint: "/workergroups/{id}/", method: "DELETE" },
+			"delete_endpoint_delete": { endpoint: "/endptjobs/{id}/", method: "DELETE" },
+			"get_workergroup_logs_post": { endpoint: "", method: "POST" },
+			"get_workergroup_workers_post": { endpoint: "", method: "POST" },
 			"get_endpoint_logs_post": { endpoint: "", method: "POST" },
 			"get_endpoint_workers_post": { endpoint: "", method: "POST" },
 			"route_post": { endpoint: "", method: "POST" },
-			"show_autogroup_get": { endpoint: "/autojobs/", method: "GET" },
+			"show_workergroup_get": { endpoint: "/autojobs/", method: "GET" },
 			"show_endpoints_get": { endpoint: "/endptjobs/", method: "GET" },
-			"update_autogroup_put": { endpoint: "", method: "PUT" },
-			"update_endpoint_put": { endpoint: "", method: "PUT" },
+			"update_workergroup_put": { endpoint: "/workergroups/{id}/", method: "PUT" },
+			"update_endpoint_put": { endpoint: "/endptjobs/{id}/", method: "PUT" },
 
 			// Template
 			"create_template_post": { endpoint: "/template/", method: "POST" },
@@ -966,6 +977,74 @@ export class VastAiNode implements INodeType {
 								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
 							}
 							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'delete_workergroup_delete':
+						{
+							const id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'update_workergroup_put':
+						{
+							const {id, ...rest} = requestBody;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							requestOptions.body = rest;
+							break;
+						}
+					case 'delete_endpoint_delete':
+						{
+							const id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'update_endpoint_put':
+						{
+							const {id, ...rest} = requestBody;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							requestOptions.body = rest;
+							break;
+						}
+					case 'get_workergroup_logs_post':
+						{
+							requestOptions.url = "https://run.vast.ai/get_workergroup_logs/";
+							requestOptions.body = requestBody;
+							break;
+						}
+					case 'get_workergroup_workers_post':
+						{
+							requestOptions.url = "https://run.vast.ai/get_workergroup_workers/";
+							requestOptions.body = requestBody;
+							break;
+						}
+					case 'get_endpoint_logs_post':
+						{
+							requestOptions.url = "https://run.vast.ai/get_endpoint_logs/";
+							requestOptions.body = requestBody;
+							break;
+						}
+					case 'get_endpoint_workers_post':
+						{
+							requestOptions.url = "https://run.vast.ai/get_endpoint_workers/";
+							requestOptions.body = requestBody;
+							break;
+						}
+					case 'route_post':
+						{
+							requestOptions.url = "https://run.vast.ai/route/";
+							requestOptions.body = requestBody;
 							break;
 						}
 					default:
