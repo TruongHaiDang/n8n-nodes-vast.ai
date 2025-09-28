@@ -45,7 +45,7 @@ jobs:
 
       - name: Publish to npm
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_G_TOKEN }}
         run: pnpm publish --access public
 
   notify-telegram:
