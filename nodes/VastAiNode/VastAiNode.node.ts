@@ -49,6 +49,20 @@ import { setMinBidParams } from './Machines/setMinBid';
 import { showMachinesParams } from './Machines/ShowMachines';
 import { unlistMachineParams } from './Machines/UnlistMachine';
 import { createApiKeyParams } from './Accounts/CreateApiKey';
+import { createEnvVarParams } from './Accounts/CreateEnvVar';
+import { deleteEnvVarParams } from './Accounts/DeleteEnvVar';
+import { updateEnvVarParams } from './Accounts/UpdateEnvVar';
+import { showAPIKeyParams } from './Accounts/ShowAPIKey';
+import { deleteApiKeyParams } from './Accounts/DeleteAPIKey';
+import { createSshKeyParams } from './Accounts/CreateSSHKey';
+import { createSubaccountParams } from './Accounts/CreateSubaccount';
+import { setUserParams } from './Accounts/SetUser';
+import { deleteSshKeyParams } from './Accounts/DeleteSSHKey';
+import { updateSshKeyParams } from './Accounts/UpdateSSHKey';
+import { resetApiKeyParams } from './Accounts/ResetAPIKey';
+import { showIpaddrsParams } from './Accounts/ShowIpaddrs';
+import { showTeamRoleParams } from './Accounts/ShowTeamRole';
+import { transferCreditParams } from './Accounts/TransferCredit';
 
 interface ApiEndpoint {
 	endpoint: string;
@@ -185,26 +199,26 @@ export class VastAiNode implements INodeType {
 					case 'accounts':
 						return [
 							{ name: 'Create API Key', value: 'create_api_key_post' },
-							// { name: 'Create Env Var', value: 'create_env_var_post' },
-							// { name: 'Create SSH Key', value: 'create_ssh_key_post' },
-							// { name: 'Create Subaccount', value: 'create_subaccount_post' },
-							// { name: 'Delete API Key', value: 'delete_api_key_delete' },
-							// { name: 'Delete Env Var', value: 'delete_env_var_delete' },
-							// { name: 'Delete SSH Key', value: 'delete_ssh_key_delete' },
-							// { name: 'Reset API Key', value: 'reset_api_key_put' },
-							// { name: 'Set User', value: 'set_user_put' },
+							{ name: 'Create Env Var', value: 'create_env_var_post' },
+							{ name: 'Create SSH Key', value: 'create_ssh_key_post' },
+							{ name: 'Create Subaccount', value: 'create_subaccount_post' },
+							{ name: 'Delete API Key', value: 'delete_api_key_delete' },
+							{ name: 'Delete Env Var', value: 'delete_env_var_delete' },
+							{ name: 'Delete SSH Key', value: 'delete_ssh_key_delete' },
+							{ name: 'Reset API Key', value: 'reset_api_key_put' },
+							{ name: 'Set User', value: 'set_user_put' },
 							{ name: 'Show API Keys', value: 'show_api_keys_get' },
-							// { name: 'Show API Key', value: 'show_api_key_get' },
+							{ name: 'Show API Key', value: 'show_api_key_get' },
 							{ name: 'Show Connections', value: 'show_connections_get' },
 							{ name: 'Show Env Vars', value: 'show_env_vars_get' },
-							// { name: 'Show Ipaddrs', value: 'show_ipaddrs_get' },
-							// { name: 'Show SSH Keys', value: 'acc_show_ssh_keys_get' },
+							{ name: 'Show Ipaddrs', value: 'show_ipaddrs_get' },
+							{ name: 'Show SSH Keys', value: 'acc_show_ssh_keys_get' },
 							{ name: 'Show Subaccounts', value: 'show_subaccounts_get' },
-							// { name: 'Show Team Role', value: 'show_team_role_get' },
+							{ name: 'Show Team Role', value: 'show_team_role_get' },
 							{ name: 'Show User', value: 'show_user_get' },
-							// { name: 'Transfer Credit', value: 'transfer_credit_put' },
-							// { name: 'Update Env Var', value: 'update_env_var_put' },
-							// { name: 'Update SSH Key', value: 'update_ssh_key_put' },
+							{ name: 'Transfer Credit', value: 'transfer_credit_put' },
+							{ name: 'Update Env Var', value: 'update_env_var_put' },
+							{ name: 'Update SSH Key', value: 'update_ssh_key_put' },
 						];
 					case 'serverless':
 						return [
@@ -332,43 +346,43 @@ export class VastAiNode implements INodeType {
 					case 'show_api_keys_get':
 						return [];
 					case 'create_env_var_post':
-						return [];
+						return createEnvVarParams;
 					case 'delete_env_var_delete':
-						return [];
+						return deleteEnvVarParams;
 					case 'show_env_vars_get':
 						return [];
 					case 'update_env_var_put':
-						return [];
+						return updateEnvVarParams;
 					case 'create_ssh_key_post':
-						return [];
+						return createSshKeyParams;
 					case 'acc_show_ssh_keys_get':
 						return [];
 					case 'create_subaccount_post':
-						return [];
+						return createSubaccountParams;
 					case 'set_user_put':
-						return [];
+						return setUserParams;
 					case 'delete_api_key_delete':
-						return [];
+						return deleteApiKeyParams;
 					case 'show_api_key_get':
-						return [];
+						return showAPIKeyParams;
 					case 'delete_ssh_key_delete':
-						return [];
+						return deleteSshKeyParams;
 					case 'update_ssh_key_put':
-						return [];
+						return updateSshKeyParams;
 					case 'reset_api_key_put':
-						return [];
+						return resetApiKeyParams;
 					case 'show_connections_get':
 						return [];
 					case 'show_ipaddrs_get':
-						return [];
+						return showIpaddrsParams;
 					case 'show_subaccounts_get':
 						return [];
 					case 'show_team_role_get':
-						return [];
+						return showTeamRoleParams;
 					case 'show_user_get':
 						return [];
 					case 'transfer_credit_put':
-						return [];
+						return transferCreditParams;
 
 					// Serverless cases
 					case 'create_autogroup_post':
@@ -468,26 +482,26 @@ export class VastAiNode implements INodeType {
 		const apisMap: Record<string, ApiEndpoint> = {
 			// Accounts
 			"create_api_key_post": { endpoint: "/auth/apikeys/", method: "POST" },
-			"create_env_var_post": { endpoint: "", method: "POST" },
-			"create_ssh_key_post": { endpoint: "", method: "POST" },
-			"create_subaccount_post": { endpoint: "", method: "POST" },
-			"delete_api_key_delete": { endpoint: "", method: "DELETE" },
-			"delete_env_var_delete": { endpoint: "", method: "DELETE" },
-			"delete_ssh_key_delete": { endpoint: "", method: "DELETE" },
-			"reset_api_key_put": { endpoint: "", method: "PUT" },
-			"set_user_put": { endpoint: "", method: "PUT" },
-			"show_api_key_get": { endpoint: "", method: "GET" },
+			"create_env_var_post": { endpoint: "/secrets/", method: "POST" },
+			"create_ssh_key_post": { endpoint: "/ssh/", method: "POST" },
+			"create_subaccount_post": { endpoint: "/users/", method: "POST" },
+			"delete_api_key_delete": { endpoint: "/auth/apikeys/{id}/", method: "DELETE" },
+			"delete_env_var_delete": { endpoint: "/secrets/", method: "DELETE" },
+			"delete_ssh_key_delete": { endpoint: "/ssh/{id}/", method: "DELETE" },
+			"reset_api_key_put": { endpoint: "/commands/reset_apikey/", method: "PUT" },
+			"set_user_put": { endpoint: "/users/", method: "PUT" },
+			"show_api_key_get": { endpoint: "/auth/apikeys/{id}/", method: "GET" },
 			"show_api_keys_get": { endpoint: "/auth/apikeys/", method: "GET" },
 			"show_connections_get": { endpoint: "/users/cloud_integrations/", method: "GET" },
 			"show_env_vars_get": { endpoint: "/secrets/", method: "GET" },
-			"show_ipaddrs_get": { endpoint: "", method: "GET" },
-			"acc_show_ssh_keys_get": { endpoint: "", method: "GET" },
+			"show_ipaddrs_get": { endpoint: "/users/{user_id}/ipaddrs/", method: "GET" },
+			"acc_show_ssh_keys_get": { endpoint: "/ssh/", method: "GET" },
 			"show_subaccounts_get": { endpoint: "/subaccounts/", method: "GET" },
-			"show_team_role_get": { endpoint: "", method: "GET" },
+			"show_team_role_get": { endpoint: "/team/roles/{id}/", method: "GET" },
 			"show_user_get": { endpoint: "/users/current/", method: "GET" },
-			"transfer_credit_put": { endpoint: "", method: "PUT" },
-			"update_env_var_put": { endpoint: "", method: "PUT" },
-			"update_ssh_key_put": { endpoint: "", method: "PUT" },
+			"transfer_credit_put": { endpoint: "/commands/transfer_credit/", method: "PUT" },
+			"update_env_var_put": { endpoint: "/secrets/", method: "PUT" },
+			"update_ssh_key_put": { endpoint: "/ssh/{id}/", method: "PUT" },
 
 			// Billing
 			"search_invoices_get": { endpoint: "/invoices", method: "GET" },
@@ -897,6 +911,61 @@ export class VastAiNode implements INodeType {
 								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: machine_id', { itemIndex });
 							}
 							requestOptions.url = requestOptions.url.replace('{machine_id}', encodeURIComponent(String(machine_id)));
+							break;
+						}
+					case 'show_api_key_get':
+						{
+							let id = queryParams.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'delete_api_key_delete':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'delete_ssh_key_delete':
+						{
+							let id = requestBody.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							break;
+						}
+					case 'update_ssh_key_put':
+						{
+							const {id, ...rest} = requestBody;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
+							requestOptions.body = rest;
+							break;
+						}
+					case 'show_ipaddrs_get':
+						{
+							const user_id = queryParams.user_id;
+							if (user_id == null || user_id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: user_id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{user_id}', encodeURIComponent(String(user_id)));
+							break;
+						}
+					case 'show_team_role_get':
+						{
+							const id = queryParams.id;
+							if (id == null || id === '') {
+								throw new NodeOperationError(this.getNode(), 'Missing required path parameter: id', { itemIndex });
+							}
+							requestOptions.url = requestOptions.url.replace('{id}', encodeURIComponent(String(id)));
 							break;
 						}
 					default:
